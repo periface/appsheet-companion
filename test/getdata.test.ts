@@ -1,6 +1,6 @@
 import InitCompanion from "../src";
 import { SetupProps, SheetDataReq } from "../types";
-
+// yeh, i dont like testing, if it works, it works
 const config: SetupProps = { 
     googleApi:{
         rootFolder: './credentials',
@@ -25,6 +25,7 @@ test('check valid result', async () => {
         ]
     } as SheetDataReq);
     const result = await promise;
+    expect(result.response.data.length).toHaveLength
     const value1 = result.findByColumnName('ISW2106233R1', 'RFC');
     expect(value1).not.toBeUndefined();
     const value2 = result.findByColumnPosition('ISW2106233R1', 0);

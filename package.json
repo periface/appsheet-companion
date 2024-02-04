@@ -1,12 +1,12 @@
 {
     "name": "appsheet-companion",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "Herramientas para facilitar el uso de Appsheets",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsup src/index.ts --format cjs --dts-resolve --minify --clean --sourcemap --legacy-output --target node12",
-        "test": "jest --coverage"
+        "test": "jest --coverage",
     },
     "keywords": [
         "appsheet",

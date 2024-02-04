@@ -1,8 +1,6 @@
 import { ColumnValue, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps } from "../types";
 import GoogleApi, { IGoogleApi } from "./google-api";
 let googleApi : IGoogleApi;  
-
-
 const getDataFromTable= async (input: SheetDataReq) => {
     try{
         const table = input;
@@ -73,7 +71,7 @@ const useDataFromTable = async (input: SheetDataReq) => {
         };
     }
     return {
-        data: response,
+        response,
         findByColumnName,
         findByColumnPosition
     }
