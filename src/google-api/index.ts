@@ -5,10 +5,10 @@ import axios from 'axios';
 
 import type { GoogleAuth } from "google-auth-library";
 import type { JSONClient } from "google-auth-library/build/src/auth/googleauth";
-import { drive_v3, Auth, sheets_v4, docs_v1, google } from "googleapis";
+import { drive_v3, Auth, sheets_v4, docs_v1 } from "googleapis";
 import { join } from "path";
 import { Readable } from "stream";
-import { GoogleApiConfig } from '../../types';
+import { GoogleApiConfig } from '../types';
 let _auth: GoogleAuth<JSONClient>;
 let _config: GoogleApiConfig;
 let _debug: boolean | undefined;
@@ -219,9 +219,18 @@ async function alternativeDownloadAsStream(docId: string) {
         throw error;
     }
 }
-async function insertGoogleSheetData(docId: string, bookAndRange: string, data: string[][]) {
+async function insertGoogleSheetData(docId: string, bookAndRange: string, data: string[][], clear: boolean = false) {
     try {
-
+        if(clear){
+            const clearResponse = await _sheets.spreadsheets.values.clear({
+                spreadsheetId: docId,
+                range: bookAndRange
+            });
+            if (_debug) {
+                console.log("[insertGoogleSheetData] Clear Response");
+                console.log(clearResponse);
+            }
+        }
         const response = await _sheets.spreadsheets.values.update({
             spreadsheetId: docId,
             range: bookAndRange,
@@ -230,7 +239,7 @@ async function insertGoogleSheetData(docId: string, bookAndRange: string, data: 
                 values: data
             }
         });
-        return response;
+        return response.data;
     } catch (error) {
         if (_debug) {
             console.log("[insertGoogleSheetData] Error");

@@ -1,5 +1,4 @@
-import InitCompanion from "../src";
-import { SetupProps, SheetDataReq } from "../types";
+import {Init, type SetupProps,SheetDataReq } from "../src";
 // yeh, i dont like testing, if it works, it works
 const config: SetupProps = { 
     googleApi:{
@@ -9,7 +8,7 @@ const config: SetupProps = {
 }
 
 test('check valid result', async () => {
-    const companion = InitCompanion(config);
+    const companion = Init(config);
     const promise = companion.spreadSheetServices.useDataFromTable({
         googleFileId: '1m0gmwlVxk1OUDevtyLD0dkZjJzm1EYTA7RqxkXDgj9Y',
         sheetName:'PADRON DE PROVEEDORES',
@@ -25,9 +24,13 @@ test('check valid result', async () => {
         ]
     } as SheetDataReq);
     const result = await promise;
+    expect(result.response.error).toBeUndefined();
     expect(result.response.data.length).toHaveLength
-    const value1 = result.findByColumnName('ISW2106233R1', 'RFC');
+    
+    expect(result.response.data.length).toBeGreaterThan(0);
+    const value1 = result.findByColumnName('COM9908193R3', 'RFC');
     expect(value1).not.toBeUndefined();
-    const value2 = result.findByColumnPosition('ISW2106233R1', 0);
+    expect(value1.data).toHaveProperty('RFC');
+    const value2 = result.findByColumnPosition('COM9908193R3', 0);
     expect(value2).not.toBeUndefined();
 });

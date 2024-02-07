@@ -1,12 +1,19 @@
 {
     "name": "appsheet-companion",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Herramientas para facilitar el uso de Appsheets",
-    "main": "index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "module": "./dist/index.mjs",
+    "files": [
+        "dist"
+    ],
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsup src/index.ts --format cjs --dts-resolve --minify --clean --sourcemap --legacy-output --target node12",
-        "test": "jest --coverage",
+        "test": "jest",
+        "build": "tsup src/index.ts",
+        "copy": "copyfiles -u 1 \"src/**/*.d.ts\" dist",
+        "prepublish": "npm run build && npm run copy",
+        "buildandpublish": "npm run build && npm run copy && npm publish"
     },
     "keywords": [
         "appsheet",
@@ -19,6 +26,7 @@
     "license": "MIT",
     "devDependencies": {
         "@types/jest": "^29.5.11",
+        "copyfiles": "^2.4.1",
         "jest": "^29.7.0",
         "ts-jest": "^29.1.2",
         "ts-node": "^10.9.2",
