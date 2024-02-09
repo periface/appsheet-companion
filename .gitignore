@@ -2,6 +2,8 @@
 /coverage.data
 /coverage
 /credentials
-/credentials/*
+/credentials/*.json
 /credentials.json
+credentials.json
 /dist
+credentials
