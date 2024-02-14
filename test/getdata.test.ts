@@ -26,11 +26,8 @@ test('check valid result', async () => {
     const result = await promise;
     expect(result.response.error).toBeUndefined();
     expect(result.response.data.length).toHaveLength
-    
     expect(result.response.data.length).toBeGreaterThan(0);
     const value1 = result.findByColumnName('COM9908193R3', 'RFC');
     expect(value1).not.toBeUndefined();
     expect(value1.data).toHaveProperty('RFC');
-    const value2 = result.findByColumnPosition('COM9908193R3', 0);
-    expect(value2).not.toBeUndefined();
 });

@@ -15,28 +15,26 @@ let _debug: boolean | undefined;
 let _drive: drive_v3.Drive;
 let _sheets: sheets_v4.Sheets;
 let _docs: docs_v1.Docs;
-
-//SCOPES necesarios para acceder a los archivos de google drive
-//ID de la carpeta donde se guardan los contratos
+const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 /**
  * Crea la instancia de autenticación de google
  * @returns GoogleAuth<JSONClient>9-8
  */
 
 function authGoogle(config: GoogleApiConfig): GoogleAuth<JSONClient> {
-    
+
     if (_auth) return _auth;
     const jsonDirectory = join(process.cwd(), config.rootFolder as string);
     _auth = new Auth.GoogleAuth({
         keyFile: join(jsonDirectory, config.fileName as string),
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+        scopes: SCOPES
     });
 
     return _auth;
 }
 function getSheetsInstance() {
     if (_sheets) return _sheets;
-    
+
     const auth = authGoogle(_config);
     const sheets = new sheets_v4.Sheets({ auth: auth });
     _sheets = sheets;
@@ -44,7 +42,7 @@ function getSheetsInstance() {
 }
 function getDriveInstance() {
     if (_drive) return _drive;
-   
+
     const auth = authGoogle(_config);
     const drive = new drive_v3.Drive({ auth: auth });
     _drive = drive;
@@ -52,7 +50,7 @@ function getDriveInstance() {
 }
 function getDocsInstance() {
     if (_docs) return _docs;
-   
+
     const auth = authGoogle(_config);
     const docs = new docs_v1.Docs({ auth: auth });
     _docs = docs;
@@ -64,7 +62,7 @@ function getDocsInstance() {
  * @param fileName
  * @param buf
  */
-async function readAndUpload(fileName: string, buf: never, mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", folderId: string) {
+async function readAndUpload(fileName: string, buf: Buffer, mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", folderId: string) {
     try {
         const auth = authGoogle(_config);
         const drive = new drive_v3.Drive({ auth: auth });
@@ -186,7 +184,7 @@ async function downloadGoogleDocAsStream(docId: string) {
 
 
         });
-        return buffer;
+        return buffer as Buffer;
     } catch (error) {
         if (_debug) {
             console.log("[downloadGoogleDocAsStream] Error");

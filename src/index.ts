@@ -100,7 +100,7 @@ export const Init = (props:SetupProps) : Companion=>{
         spreadSheetServices
     } 
 }
-export {SetupProps, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput}
+export {SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput}
 // HELPERS
 function trimAndUpperCase(value: string){
     return value.trim().toUpperCase();

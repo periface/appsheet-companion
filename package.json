@@ -1,6 +1,6 @@
 {
     "name": "appsheet-companion",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "Herramientas para facilitar el uso de Appsheets",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
