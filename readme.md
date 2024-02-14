@@ -24,15 +24,13 @@ Que necesitamos?
 
 ### Dentro de tu proyecto de NodeJs, instala el paquete
 
-**NPM**
-> `npm i appsheet-companion`
-**YARN**
-> `yarn add appsheet-companion`
-
-Importa la libreria a tu proyecto ;)
-
-`import { Init, type Companion, type SheetDataReq} from 'appsheet-companion'`
+### NPM
+ `npm i appsheet-companion`
+### YARN
+ `yarn add appsheet-companion`
+** USO **
 ```
+    import { Init, type Companion, type SheetDataReq} from 'appsheet-companion'
     async function main(){
         const companion = Init({
             googleApi:{
