@@ -8,7 +8,7 @@ Necesitamos una herramienta que nos permita llamar datos de hojas de spreadsheet
 más conveniente, así que se desarrolló esta herramienta (sencilla para mi al menos), que nos proporciona
 un api sencillo para poder cargar estos datos en memoria, pero convertidos a objetos faciles de manejar.
 
-## US BÁSICO... POR QUE NO HAY OTRO
+## USO BÁSICO... POR QUE NO HAY OTRO
 Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
 
 ![ejemplo1](https://drive.usercontent.google.com/download?id=1H-GWpWBcQOTvioUfAq3-W4qtwbEjWgiv&authuser=0, "Ejemplo 1")
