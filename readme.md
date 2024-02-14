@@ -22,12 +22,56 @@ Que necesitamos?
 
 ![ejemplo2](https://drive.usercontent.google.com/download?id=1C7fExBiyISIu1DKcTLJ1G4YFUBZF6iFz&authuser=0, "Ejemplo2")
 
-Dentro de tu proyecto de NodeJs, instala el paquete
+### Dentro de tu proyecto de NodeJs, instala el paquete
 
 **NPM**
-`npm i appsheet-companion`
+> `npm i appsheet-companion`
 **YARN**
-`yarn add appsheet-companion`
+> `yarn add appsheet-companion`
 
+Importa la libreria a tu proyecto ;)
 
+`import { Init, type Companion, type SheetDataReq} from 'appsheet-companion'`
+```
+    async function main(){
+        const companion = Init({
+            googleApi:{
+                rootFolder:'google', // not the sharpest tool in the shed
+                fileName:'credentials.json' // not the sharpest tool in the shed
+            }
+        });
+        const usersRequest:SheetDataReq = {
+            sheetName:'USERS',// hoja dentro del spreadsheet
+            sheetRange:'A2:ZZ',
+            googleFileId:'1_1qQIS-cZhQqjhPQmnwevrjOKuBJo8G6-G-p5hIwjXc', // id del spreadsheet
+            columns:[{
+                position:0,
+                name:'id',
+            },
+            {
+                position:1,
+                name:'nombre'
+            },
+            {
+                position:2,
+                name:'apellido'
+            },
+            {
+                position:3,
+                name:'email'
+            }]
+        }
+        const usersTable = companion.spreadSheetServices.useDataFromTable(usersRequest);
+        console.log(usersTable.response.rawData); // Datos recibidos de la tabla en formato string[][]
+        console.log(usersTable.response.data); // Datos recibidos de la tabla convertidos a objetos
+        /* ej. 
+        [{
+            id:'1',
+            nombre:'Alan',
+            apellido:'Torres',
+            email:'a@a.com'
+        }]
+        */
+    }   
 
+```
