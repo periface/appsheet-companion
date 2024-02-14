@@ -5,10 +5,10 @@
 En el ámbito gubernamental del estado de Tamaulipas, se ha adoptado la tecnología Google AppSheets para desarrollar aplicativos simples que aborden problemáticas cotidianas. Sin embargo, conforme algunos de estos aplicativos muestran un potencial significativo, surge la necesidad imperante de migrarlos hacia plataformas más robustas. Es importante destacar que esta decisión no implica que Google AppSheets carezca de robustez; simplemente, se busca aprovechar plataformas con características adicionales para atender las crecientes demandas y complejidades de dichos aplicativos.
 # Introducción (SIN GPT)
 Necesitamos una herramienta que nos permita llamar datos de hojas de spreadsheets de una manera
-más conveniente, así que se desarrollo esta herramienta (sencilla para mi al menos), que nos proporciona
+más conveniente, así que se desarrolló esta herramienta (sencilla para mi al menos), que nos proporciona
 un api sencillo para poder cargar estos datos en memoria, pero convertidos a objetos faciles de manejar.
 
-## USO BÁSICO... POR QUE NO HAY OTRO
+## US BÁSICO... POR QUE NO HAY OTRO
 Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
 
 ![ejemplo1](https://drive.usercontent.google.com/download?id=1H-GWpWBcQOTvioUfAq3-W4qtwbEjWgiv&authuser=0, "Ejemplo 1")

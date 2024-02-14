@@ -1,6 +1,6 @@
 {
     "name": "appsheet-companion",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "description": "Herramientas para facilitar el uso de Appsheets",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -8,6 +8,10 @@
     "files": [
         "dist"
     ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/periface/appsheet-companion.git"
+    },
     "scripts": {
         "test": "jest",
         "build": "tsup src/index.ts",
@@ -22,6 +26,7 @@
         "query",
         "data"
     ],
+    "homepage": "https://github.com/periface/appsheet-companion#readme",
     "author": "Alan Torres",
     "license": "MIT",
     "devDependencies": {
