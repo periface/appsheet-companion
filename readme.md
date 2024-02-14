@@ -1,4 +1,4 @@
-# Node AppSheetCompanion 
+# TS-NODE AppSheetCompanion 
 
 ## Herramienta para migración de datos almacenados en la plataforma Appsheets
 # Introducción
