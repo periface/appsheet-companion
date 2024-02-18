@@ -31,7 +31,8 @@ test('check valid result', async () => {
     const result = await promise;
     expect(result.response.error).toBeUndefined();
     expect(result.response.data.size).toHaveLength
-    expect(result.response.data.size).toBeGreaterThan(0);
+    expect(result.response.data.size).toBeGreaterThan(100);
+    console.log(result.response.data.size);
     const value1 = result.findByColumnName('COM9908193R3', 'RFC');
     const value2 = result.findByColumnName('MECE581001KN5', 'RFC');
     expect(value1).not.toBeUndefined();

@@ -9,7 +9,8 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
         const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position); 
         const dataSet = new Set<ColumnValue>();
         const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength;
-        const rowLimit = spreadSheetColumnsLength;
+        const rowLimit = input.totalColumns ? input.totalColumns : spreadSheetColumnsLength;
+        //remove first row because it contains the column names
         const totalElements = rawSpreadSheetData.rows.length / spreadSheetColumnsLength;
         requestedColumns.forEach((column: Column) => {
             if(column.position > spreadSheetColumnsLength){
@@ -36,7 +37,7 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
             }
             const columnName = foundColumnPosition.name;
             internalObject[columnName] = internalValue;
-            if(columnPosition === rowLimit - 1){ 
+            if(columnPosition === rowLimit ){ 
                 dataSet.add(internalObject);
                 internalObject = {};
                 columnPosition = 0;

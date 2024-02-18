@@ -15,6 +15,7 @@ export type SheetDataReq = {
     googleFileId: string;
     columns: Column[];
     onEmptyFieldStringValue?: string;
+    totalColumns?: number;
 }
 export type GetDataResponseProps = {
     data: Set<ColumnValue>;

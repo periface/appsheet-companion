@@ -103,15 +103,32 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
             range: range,
         });
         const rows = response.data.values;
-        const columnsLength = rows?.[0].length;
+        if (!rows) return {
+            rows: [],
+            columnsLength: 0
+        };
+        const columnsLength = rows[0].length;
+        // remove first row
+        rows.shift();
         if (!rows) return {
             rows: [],
             columnsLength: 0
         };
         if (rows.length) {
+            for (let i = 0; i < rows.length; i++) {
+                const rowValues = rows[i];
+                if (rowValues.length < columnsLength) {
+                    const diff = columnsLength - rowValues.length;
+                    for (let j = 0; j < diff; j++) {
+                        rowValues.push("");
+                    }
+                }
+            }
+
+
             return {
                 rows: rows.flat(),
-              columnsLength:  columnsLength || 0
+                columnsLength:  columnsLength || 0
             };
         } else {
             return {
