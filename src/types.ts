@@ -17,14 +17,16 @@ export type SheetDataReq = {
     onEmptyFieldStringValue?: string;
 }
 export type GetDataResponseProps = {
-    data: ColumnValue[];
+    data: Set<ColumnValue>;
     error?: string;
-    rawData: string[][];
+    rawData: string[];
+    totalRows: number;
+    columnSize: number;
 }
 export type GetElementResponseProps = {
     data: ColumnValue;
     error?: string;
-    rawData: string[];
+    rawData: string[][];
 }
 export type GoogleApiConfig = {
     /**
@@ -43,7 +45,6 @@ export type GetDataFromTable = {
 export type UseDataFromTable = {
     response: GetDataResponseProps,
     findByColumnName: (value: string, column: string) => GetElementResponseProps,
-    findByColumnPosition: (value: string, column: number) => GetElementResponseProps
 }
 export type SpreadSheetServices = {
     getDataFromTable:(input: SheetDataReq)=> Promise<GetDataResponseProps>,

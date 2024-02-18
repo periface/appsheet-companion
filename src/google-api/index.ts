@@ -92,12 +92,53 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
         throw error;
     }
 }
+async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
+    rows: string[],
+    columnsLength: number
+
+}> {
+    try {
+        const response = await _sheets.spreadsheets.values.get({
+            spreadsheetId: sheetId,
+            range: range,
+        });
+        const rows = response.data.values;
+        const columnsLength = rows?.[0].length;
+        if (!rows) return {
+            rows: [],
+            columnsLength: 0
+        };
+        if (rows.length) {
+            return {
+                rows: rows.flat(),
+              columnsLength:  columnsLength || 0
+            };
+        } else {
+            return {
+                rows: [],
+                columnsLength: 0
+            };
+        }
+    } catch (error) {
+        if (_debug) {
+            console.log("[getGoogleSheetDataAsFlatArray] ERROR " + sheetId + "rango: " + range);
+            console.info(error);
+        }
+        throw error;
+    }
+
+}
+
+
 /**
  *
  * @param sheetId id de la hoja de google sheets
  * @param range rango de la hoja de google sheets (ejemplo: "CONTRATOS!A2:ZZ1000")
  * @returns array de arrays con los datos de la hoja de google sheets
  */
+
+
+
 async function getGoogleSheetData(sheetId: string, range: string): Promise<string[][]> {
     try {
         const response = await _sheets.spreadsheets.values.get({
@@ -334,7 +375,8 @@ export type IGoogleApi = {
     appendGoogleSheetData: typeof appendGoogleSheetData,
     updateSheetRowAtIndex: typeof updateSheetRowAtIndex,
     downloadJsonFile: typeof downloadJsonFile,
-    findFilesByName: typeof findFilesByName
+    findFilesByName: typeof findFilesByName,
+    getGoogleSheetDataAsFlatArray: typeof getGoogleSheetDataAsFlatArray
 }
 
 const GoogleApi = (config: GoogleApiConfig, debug?: boolean): IGoogleApi => {
@@ -345,6 +387,7 @@ const GoogleApi = (config: GoogleApiConfig, debug?: boolean): IGoogleApi => {
     _sheets = getSheetsInstance();
     _docs = getDocsInstance();
     return {
+        getGoogleSheetDataAsFlatArray,
         readAndUpload,
         getGoogleSheetData,
         downloadGoogleDocAsStream,

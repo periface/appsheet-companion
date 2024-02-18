@@ -5,23 +5,60 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
     try{
         const table = input;
         const sheetRange = table.sheetName + '!' + table.sheetRange;
-        const rawSpreadSheetData = await googleApi.getGoogleSheetData(table.googleFileId, sheetRange);
-        const data = rawSpreadSheetData.map((row: string[]) => {
-            const rowData = buildRowData(row, table.columns);
-            return rowData;
+        const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
+        const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position); 
+        const dataSet = new Set<ColumnValue>();
+        const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength;
+        const rowLimit = spreadSheetColumnsLength;
+        const totalElements = rawSpreadSheetData.rows.length / spreadSheetColumnsLength;
+        requestedColumns.forEach((column: Column) => {
+            if(column.position > spreadSheetColumnsLength){
+                throw new Error(`Column position is out of range Column: ${column.name} - Position: ${column.position} > ${spreadSheetColumnsLength}`);
+            }
         });
+
+        const spreadSheetDataRows = rawSpreadSheetData.rows;
+        // we need to separate the rows by spreadSheetDataColumns length and then build the row data using the requested columns
+        let columnPosition = 0;
+        let internalObject: ColumnValue = {};
+        for (let i = 0; i < spreadSheetDataRows.length; i++) {
+            const internalValue = spreadSheetDataRows[i];
+
+            const foundColumnPosition = requestedColumns.find((column: Column) => column.position === columnPosition);
+            if(!foundColumnPosition){
+                columnPosition++;
+                if(columnPosition === rowLimit){
+                    dataSet.add(internalObject);
+                    internalObject = {};
+                    columnPosition = 0;
+                }
+                continue;
+            }
+            const columnName = foundColumnPosition.name;
+            internalObject[columnName] = internalValue;
+            if(columnPosition === rowLimit - 1){ 
+                dataSet.add(internalObject);
+                internalObject = {};
+                columnPosition = 0;
+            }
+            columnPosition++;
+        }
         return {
-            data,
-            rawData: rawSpreadSheetData,
-            error: undefined
+            data:dataSet,
+            rawData: rawSpreadSheetData.rows,
+            error: undefined,
+            totalRows: totalElements,
+            columnSize: spreadSheetColumnsLength
         };
     }
     catch(e: any){
         console.log('error', e.message);
         return {
-            data: [],
+            data: new Set<ColumnValue>(), 
             error: e.message,
-            rawData: []
+            rawData: [],
+            totalRows: 0,
+            columnSize: 0
         };
     }
 }
@@ -45,36 +82,15 @@ const useDataFromTable = async (input: SheetDataReq) : Promise<UseDataFromTable>
             return {
                 error: e.message,
                 data: {} as ColumnValue,
-                rawData: []
-            } 
-        };
-    }
-
-    const findByColumnPosition = (value: string, column: number) => {
-        try{
-            const findResponse : GetElementResponseProps = {} as GetElementResponseProps;
-            const result = findElementByColumnPosition(value, column, response.rawData);
-            if(!result){
-                findResponse.error = 'No se encontró el elemento';
-            }
-            else{
-                findResponse.data = buildRowData(result, input.columns);
-            }
-            return findResponse;
-        }
-        catch(e:any){
-            return {
-                error: e.message,
-                data: {} as ColumnValue,
-                rawData: []
-            } as GetElementResponseProps
+                rawData: [] as string[][]
+            } as GetElementResponseProps;
         };
     }
     return {
         response,
         findByColumnName,
-        findByColumnPosition
-    } as UseDataFromTable;
+
+    }
 }
 const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     try{
@@ -105,122 +121,15 @@ export {SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDat
 function trimAndUpperCase(value: string){
     return value.trim().toUpperCase();
 }
-const findElementByColumnName = (value: string, column: string, data: ColumnValue[]) => {
+const findElementByColumnName = (value: string, column: string, data: Set<ColumnValue>) => {
     // using reverse for
-    let algoritm = "reverse-for"
     // trim and upper case value
     //
     value = trimAndUpperCase(value);
-    switch(algoritm){
-        case 'reverse-for':
-            for(let i = data.length - 1; i >= 0; i--){
-                const row = data[i];
-                if(trimAndUpperCase(row[column]) === value){
-                    return row;
-                }
-            }
-        case 'for':
-            for(let i = 0; i < data.length; i++){
-                const row = data[i];
-                if(trimAndUpperCase(row[column]) === value){
-                    return row;
-                }
-            }
-        case 'filter':
-            const filterResult = data.filter((row: ColumnValue) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            })[0];
-            return filterResult;
-        case 'find':
-            const findResult = data.find((row: ColumnValue) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            });
-            return findResult;
-        case 'findIndex':
-            const findIndexResult = data.findIndex((row: ColumnValue) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            });
-            return data[findIndexResult];
-        case 'reduce':
-            const reduceResult = data.reduce((prev: ColumnValue, row: ColumnValue) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                if(match){
-                    return row;
-                }
-                return prev;
-            }, {} as ColumnValue);
-            return reduceResult;
-        default:
-            const result = data.filter((row: ColumnValue) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            })[0];
-            return result;
-    }
+    for (let element of data) {
+        if(trimAndUpperCase(element[column]) === value){
+            return element;
+        }
+    }   
 }
-const findElementByColumnPosition = (value: string, column: number, data: string[][]) => {
-    // using reverse for
-    //
-    let algoritm = "reverse-for"
-    switch(algoritm){
-        case 'reverse-for':
-            for(let i = data.length - 1; i >= 0; i--){
-                const row = data[i];
-                if(trimAndUpperCase(row[column]) === value){
-                    return row;
-                }
-            }
-        case 'for':
-            for(let i = 0; i < data.length; i++){
-                const row = data[i];
-                if(trimAndUpperCase(row[column]) === value){
-                    return row;
-                }
-            }
-        case 'filter':
-            const filterResult = data.filter((row: string[]) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            })[0];
-            return filterResult;
-        case 'find':
-            const findResult = data.find((row: string[]) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            });
-            return findResult;
-        case 'findIndex':
-            const findIndexResult = data.findIndex((row: string[]) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            });
-            return data[findIndexResult];
-        case 'reduce':
-            const reduceResult = data.reduce((prev: string[], row: string[]) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                if(match){
-                    return row;
-                }
-                return prev;
-            }, [] as string[]);
-            return reduceResult;
-        default:
-            const result = data.filter((row: string[]) => {
-                const match = trimAndUpperCase(row[column]) === value;
-                return match;
-            })[0];
-            return result;
-    }
 
-}
-const buildRowData = (row: string[], columns: Column[]) => {
-    const rowData: ColumnValue = {};
-    columns.forEach((column: Column) => {
-        const value = row[column.position];
-        rowData[column.name] = value ? value : 'N/D';
-    });
-    return rowData;
-}
