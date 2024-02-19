@@ -8,8 +8,9 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
         const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
         const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position); 
         const dataSet = new Set<ColumnValue>();
-        const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength -1;
-        const rowLimit = input.totalColumns ? input.totalColumns-1 : spreadSheetColumnsLength;
+        const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength;
+        const rowLimit = input.totalColumns ? input.totalColumns: spreadSheetColumnsLength;
+        console.log('rowLimit', rowLimit);
         //remove first row because it contains the column names
         const totalElements = rawSpreadSheetData.rows.length / spreadSheetColumnsLength;
         requestedColumns.forEach((column: Column) => {
@@ -29,12 +30,13 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
 
             if(!foundColumnPosition){
 
-                columnPosition++;
                 if(columnPosition === rowLimit){
                     dataSet.add(internalObject);
                     internalObject = {};
                     columnPosition = 0;
                 }
+
+                columnPosition++;
                 continue;
             }
 
