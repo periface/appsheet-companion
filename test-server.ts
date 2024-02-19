@@ -32,6 +32,104 @@ async function testContratos(req: http.IncomingMessage, res: http.ServerResponse
     res.write(JSON.stringify(Array.from(result.response.data)));
     res.end();
 }
+async function testObservados(req: http.IncomingMessage, res: http.ServerResponse){
+    const companion = Init(config);
+    const promise = companion.spreadSheetServices.useDataFromTable(    {
+        sheetName:'Listado_Completo_69-B',
+        googleFileId:'13KF5fC3g9thIIUjWZ7t8hPz8QiWVNVnd54VqdkwsTfE',
+        sheetRange:'A1:ZZ',
+        columns:[{
+            position:0,
+            name:'No'
+        },
+            {
+                position:1,
+                name:'RFC',
+            },
+            {
+                position:2,
+                name:'nombreContribuyente',
+            },
+            { 
+                position:3,
+                name:'situacionContribuyente'
+            },
+            {
+                position:4,
+                name:'numeroFechaOficioGlobalPresuncionSAT'
+            },
+            {
+                position:5,
+                name:'publicacionPaginaSATPresuntos'
+            },
+            {
+                position:6,
+                name:'numeroFechaOficioGlobalPresuncionDOF'
+            },
+            {
+                position:7,
+                name:'publicacionDOFpresuntos'
+            },
+            {
+                position:8,
+                name:'numeroFechaOficioGlobalContribuyentesDesvirtuaronSAT'
+            },
+            {
+                position:9,
+                name:'publicacionPaginaSATDesvirtuados'
+            },
+            {
+                position:10,
+                name:'numeroFechaOficioGlobalContribuyentesDesvirtuaronDOF'
+            },
+            {
+                position:11,
+                name:'publicacionDOFdesvirtuados'
+            },
+            {
+                position:12,
+                name:'numeroFechaOficioGlobalDefinitivosSAT'
+            },
+            {
+                position:13,
+                name:'publicacionPaginaSATDefinitivos'
+            },
+            {
+                position:14,
+                name:'numeroFechaOficioGlobalDefinitivosDOF'
+            },
+            {
+                position:15,
+                name:'publicacionDOFdefinitivos'
+            },
+            {
+                position:16,
+                name:'numeroFechaOficioGlobalSentenciaFavorableSAT'
+            },
+            {
+                position:17,
+                name:'publicacionPaginaSATSentenciaFavorable'
+            },
+            {
+                position:18,
+                name:'numeroFechaOficioGlobalSentenciaFavorableDOF'
+            },
+            {
+                position:19,
+                name:'publicacionDOFSentenciaFavorable'
+            }
+        ]
+
+    }
+
+    );
+    const result = await promise
+    console.log(result.response.data);
+    res.write(JSON.stringify(Array.from(result.response.data)));
+    res.end();
+
+
+}
 async function testProveedores(req: http.IncomingMessage, res: http.ServerResponse){
 
     const companion = Init(config);
@@ -65,4 +163,11 @@ http.createServer(async (req, res) => {
     } else if (req.url === '/proveedores') {
         await testProveedores(req,res);
     }
-}).listen(3001);
+    else if (req.url === '/observados') {
+        await testObservados(req,res);
+    }
+    else {
+        res.write('Hello World');
+        res.end();
+    }
+}).listen(1634);
