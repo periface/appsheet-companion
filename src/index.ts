@@ -2,71 +2,64 @@ import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetD
 import GoogleApi, { IGoogleApi } from "./google-api";
 let googleApi : IGoogleApi;  
 const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProps> => {
-    try{
+    try {
         const table = input;
         const sheetRange = table.sheetName + '!' + table.sheetRange;
         const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
-        const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position); 
-        const dataSet = new Set<ColumnValue>();
-        const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength;
-        const rowLimit = input.totalColumns ? input.totalColumns: spreadSheetColumnsLength;
-        console.log('rowLimit', rowLimit);
-        //remove first row because it contains the column names
-        const totalElements = rawSpreadSheetData.rows.length / spreadSheetColumnsLength;
+        const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position);
+        const dataSet: ColumnValue[] = []; // Cambiado a Array para simplificar el manejo
+        console.log('columnas detectadas', rawSpreadSheetData.columnsLength);
+        console.log('aplicando indice estandar', rawSpreadSheetData.columnsLength - 1);
+        const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength - 1;
+        const columnLimit = input.totalColumns ? input.totalColumns : spreadSheetColumnsLength;
+
+        // No necesitamos calcular totalElements de esta manera ya que será recalculado
         requestedColumns.forEach((column: Column) => {
-            if(column.position > spreadSheetColumnsLength){
+            if (column.position > spreadSheetColumnsLength) {
                 throw new Error(`Column position is out of range Column: ${column.name} - Position: ${column.position} > ${spreadSheetColumnsLength}`);
             }
         });
 
         const spreadSheetDataRows = rawSpreadSheetData.rows;
-        // we need to separate the rows by spreadSheetDataColumns length and then build the row data using the requested columns
-        let columnPosition = 0;
+        let currentColumnPosition = 0;
         let internalObject: ColumnValue = {};
+
         for (let i = 0; i < spreadSheetDataRows.length; i++) {
             const internalValue = spreadSheetDataRows[i];
+            const columnInCurrentPosition = requestedColumns.find((column: Column) => column.position === currentColumnPosition);
 
-            const foundColumnPosition = requestedColumns.find((column: Column) => column.position === columnPosition);
-
-            if(!foundColumnPosition){
-
-                if(columnPosition === rowLimit){
-                    dataSet.add(internalObject);
-                    internalObject = {};
-                    columnPosition = 0;
-                }
-
-                columnPosition++;
-                continue;
+            if (columnInCurrentPosition) {
+                const columnName = columnInCurrentPosition.name;
+                internalObject[columnName] = internalValue;
             }
 
-            const columnName = foundColumnPosition.name;
-            internalObject[columnName] = internalValue;
-            if(columnPosition === rowLimit ){ 
-                dataSet.add(internalObject);
-                internalObject = {};
-                columnPosition = 0;
+            if (currentColumnPosition === columnLimit || i === spreadSheetDataRows.length - 1) {
+                dataSet.push({ ...internalObject }); // Clonar el objeto para asegurar referencia única
+                internalObject = {}; // Resetear el objeto para el próximo ciclo
+                currentColumnPosition = -1; // Resetear a -1 ya que se incrementará a 0 al final del ciclo
             }
-            columnPosition++;
+
+            currentColumnPosition++;
         }
+
         return {
-            data:dataSet,
+            data: new Set(dataSet), // Convertir Array a Set si se requiere unicidad
             rawData: rawSpreadSheetData.rows,
             error: undefined,
-            totalRows: totalElements,
+            totalRows: dataSet.length, // Actualizar totalRows para reflejar el número de objetos únicos
             columnSize: spreadSheetColumnsLength
         };
-    }
-    catch(e: any){
+    } catch (e: any) {
         console.log('error', e.message);
         return {
-            data: new Set<ColumnValue>(), 
+            data: new Set<ColumnValue>(),
             error: e.message,
             rawData: [],
             totalRows: 0,
             columnSize: 0
         };
-    }
+    }    
+   
 }
 
 const useDataFromTable = async (input: SheetDataReq) : Promise<UseDataFromTable> => {

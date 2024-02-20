@@ -124,11 +124,8 @@ async function testObservados(req: http.IncomingMessage, res: http.ServerRespons
 
     );
     const result = await promise
-    console.log(result.response.data);
     res.write(JSON.stringify(Array.from(result.response.data)));
     res.end();
-
-
 }
 async function testProveedores(req: http.IncomingMessage, res: http.ServerResponse){
 
@@ -149,7 +146,27 @@ async function testProveedores(req: http.IncomingMessage, res: http.ServerRespon
             {
                 position:2,
                 name:'NOMBRE'
-            }
+            },
+            {
+                position:6,
+                name:'CALLE'
+            },
+            {   position:7,
+                name:'NUMERO',
+
+            },
+            {
+                position:8,
+                name:'CALLES',
+            },
+            {   
+                position:9,
+                name:'COLONIA'
+            },
+            { 
+                position:10,
+                name:'CP'
+            },
         ]
     } as SheetDataReq);
     const result = await promise
