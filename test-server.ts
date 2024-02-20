@@ -7,11 +7,11 @@ const config: SetupProps = {
         fileName: 'credentials.json',
     } 
 }
-async function testContratos(req: http.IncomingMessage, res: http.ServerResponse){
-    const companion = Init(config);
-    const promise = companion.spreadSheetServices.useDataFromTable({
-        googleFileId: '1af0RQB2dw8SM9nX8T8XdeTbVyDBMTbHnZfWaKINUeu4',
-        sheetName:'CONTRATOS',
+
+const tableRequest: Record<string,SheetDataReq> = {
+    NAMES: {
+        googleFileId: '1f9ixtL0zNpcclRBYMMUBwu1fJnfm_ckjEIKgIGqG5Xw',
+        sheetName:'Names',
         sheetRange: 'A1:ZZ',
         columns:[{
             position:0,
@@ -19,172 +19,44 @@ async function testContratos(req: http.IncomingMessage, res: http.ServerResponse
         },
             {
                 position: 1,
-                name: 'numeroContrato'
+                name: 'name'
 
             },
             {
-                position:3,
-                name:'Concepto'
-            }
-        ]
-    } as SheetDataReq);
-    const result = await promise
-    res.write(JSON.stringify(Array.from(result.response.data)));
-    res.end();
-}
-async function testObservados(req: http.IncomingMessage, res: http.ServerResponse){
-    const companion = Init(config);
-    const promise = companion.spreadSheetServices.useDataFromTable(    {
-        sheetName:'Listado_Completo_69-B',
-        googleFileId:'13KF5fC3g9thIIUjWZ7t8hPz8QiWVNVnd54VqdkwsTfE',
-        sheetRange:'A1:ZZ',
-        columns:[{
-            position:0,
-            name:'No'
-        },
-            {
-                position:1,
-                name:'RFC',
-            },
-            {
                 position:2,
-                name:'nombreContribuyente',
+                name:'number'
             },
-            { 
+            {
                 position:3,
-                name:'situacionContribuyente'
+                name:'email'
             },
             {
                 position:4,
-                name:'numeroFechaOficioGlobalPresuncionSAT'
+                name: 'noDomain'
             },
             {
                 position:5,
-                name:'publicacionPaginaSATPresuntos'
-            },
-            {
-                position:6,
-                name:'numeroFechaOficioGlobalPresuncionDOF'
-            },
-            {
-                position:7,
-                name:'publicacionDOFpresuntos'
-            },
-            {
-                position:8,
-                name:'numeroFechaOficioGlobalContribuyentesDesvirtuaronSAT'
-            },
-            {
-                position:9,
-                name:'publicacionPaginaSATDesvirtuados'
-            },
-            {
-                position:10,
-                name:'numeroFechaOficioGlobalContribuyentesDesvirtuaronDOF'
-            },
-            {
-                position:11,
-                name:'publicacionDOFdesvirtuados'
-            },
-            {
-                position:12,
-                name:'numeroFechaOficioGlobalDefinitivosSAT'
-            },
-            {
-                position:13,
-                name:'publicacionPaginaSATDefinitivos'
-            },
-            {
-                position:14,
-                name:'numeroFechaOficioGlobalDefinitivosDOF'
-            },
-            {
-                position:15,
-                name:'publicacionDOFdefinitivos'
-            },
-            {
-                position:16,
-                name:'numeroFechaOficioGlobalSentenciaFavorableSAT'
-            },
-            {
-                position:17,
-                name:'publicacionPaginaSATSentenciaFavorable'
-            },
-            {
-                position:18,
-                name:'numeroFechaOficioGlobalSentenciaFavorableDOF'
-            },
-            {
-                position:19,
-                name:'publicacionDOFSentenciaFavorable'
+                name: 'domain'
             }
         ]
+    } 
 
-    }
+} as const
 
-    );
-    const result = await promise
-    res.write(JSON.stringify(Array.from(result.response.data)));
-    res.end();
-}
-async function testProveedores(req: http.IncomingMessage, res: http.ServerResponse){
-
+async function test(req: http.IncomingMessage, res: http.ServerResponse){
     const companion = Init(config);
-    const promise = companion.spreadSheetServices.useDataFromTable({
-        googleFileId: '1m0gmwlVxk1OUDevtyLD0dkZjJzm1EYTA7RqxkXDgj9Y',
-        sheetName:'PADRON DE PROVEEDORES',
-        sheetRange: 'A1:ZZ',
-        columns:[{
-            position:0,
-            name:'RFC'
-        },
-            {
-                position: 1,
-                name: 'NUMEROPROVEEDOR'
-
-            },
-            {
-                position:2,
-                name:'NOMBRE'
-            },
-            {
-                position:6,
-                name:'CALLE'
-            },
-            {   position:7,
-                name:'NUMERO',
-
-            },
-            {
-                position:8,
-                name:'CALLES',
-            },
-            {   
-                position:9,
-                name:'COLONIA'
-            },
-            { 
-                position:10,
-                name:'CP'
-            },
-        ]
-    } as SheetDataReq);
+    const promise = companion.spreadSheetServices.useDataFromTable(tableRequest.NAMES as SheetDataReq);
     const result = await promise
     res.write(JSON.stringify(Array.from(result.response.data)));
     res.end();
-
 }
 http.createServer(async (req, res) => {
-    if (req.url === '/contratos') {
-        await testContratos(req,res);
-    } else if (req.url === '/proveedores') {
-        await testProveedores(req,res);
-    }
-    else if (req.url === '/observados') {
-        await testObservados(req,res);
-    }
-    else {
-        res.write('Hello World');
+    try{
+        await test(req,res);
+    }catch(e){
+        if(e instanceof Error){
+            res.write(e.message);
+        }
         res.end();
     }
 }).listen(1634);

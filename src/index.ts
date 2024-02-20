@@ -8,8 +8,6 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
         const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
         const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position);
         const dataSet: ColumnValue[] = []; // Cambiado a Array para simplificar el manejo
-        console.log('columnas detectadas', rawSpreadSheetData.columnsLength);
-        console.log('aplicando indice estandar', rawSpreadSheetData.columnsLength - 1);
         const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength - 1;
         const columnLimit = input.totalColumns ? input.totalColumns : spreadSheetColumnsLength;
 
@@ -68,7 +66,7 @@ const useDataFromTable = async (input: SheetDataReq) : Promise<UseDataFromTable>
         try{
             const findResponse : GetElementResponseProps = {} as GetElementResponseProps;
 
-            const result = findElementByColumnName(value, column, response.data );
+           const result = findElementByColumnName(value, column, response.data );
             if(!result){
                 findResponse.error = 'No se encontró el elemento';
             }
