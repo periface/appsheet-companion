@@ -1,7 +1,27 @@
-import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput  } from "./types";
+import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps  } from "./types";
 import GoogleApi, { IGoogleApi } from "./google-api";
 let googleApi : IGoogleApi;  
+const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataResponseGenericProps<T>> => {
+    const response = await getDataFromTable(input);
+    const data = new Set<T>();
+    response.data.forEach((element) => {
+        data.add(element as unknown as T);
+    });
+    return {
+        data,
+        error: response.error,
+        rawData: response.rawData,
+        totalRows: response.totalRows,
+        columnSize: response.columnSize
+    };
+}
 const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProps> => {
+         /*    [["1","Hola","Ruth"],["2","Adios","Ruth"]]
+            ["1","Hola","Ruth","2","Adios","Ruth"]
+            //No  Saludo  Nombre
+            //1    2        3
+            [1]  [2]      [3]
+            // cuando llegues al 3, resetea el contador*/
     try {
         const table = input;
         const sheetRange = table.sheetName + '!' + table.sheetRange;
@@ -36,10 +56,8 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
                 internalObject = {}; // Resetear el objeto para el próximo ciclo
                 currentColumnPosition = -1; // Resetear a -1 ya que se incrementará a 0 al final del ciclo
             }
-
             currentColumnPosition++;
         }
-
         return {
             data: new Set(dataSet), // Convertir Array a Set si se requiere unicidad
             rawData: rawSpreadSheetData.rows,
@@ -102,6 +120,7 @@ const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
 }
 const spreadSheetServices: SpreadSheetServices = {
     getDataFromTable,
+    getDataFromTableAndMap,
     useDataFromTable,
     insertDataIntoTable
 }

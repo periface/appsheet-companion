@@ -24,6 +24,14 @@ export type GetDataResponseProps = {
     totalRows: number;
     columnSize: number;
 }
+export type GetDataResponseGenericProps<T> = {
+    data: Set<T>;
+    error?: string;
+    rawData: string[];
+    totalRows: number;
+    columnSize: number;
+
+}
 export type GetElementResponseProps = {
     data: ColumnValue;
     error?: string;
@@ -49,8 +57,9 @@ export type UseDataFromTable = {
 }
 export type SpreadSheetServices = {
     getDataFromTable:(input: SheetDataReq)=> Promise<GetDataResponseProps>,
-    useDataFromTable:(input: SheetDataReq)=> Promise<UseDataFromTable> 
+    useDataFromTable:(input: SheetDataReq)=> Promise<UseDataFromTable>
     insertDataIntoTable:(input: ReplaceDataTableInput)=> Promise<any>
+    getDataFromTableAndMap:<T>(input: SheetDataReq)=> Promise<GetDataResponseGenericProps<T>>
 }
 export type Companion ={
     spreadSheetServices:  SpreadSheetServices

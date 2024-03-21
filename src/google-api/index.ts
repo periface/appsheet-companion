@@ -123,8 +123,7 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
                     }
                 }
             }
-
-
+          
             return {
                 rows: rows.flat(),
                 columnsLength:  columnsLength || 0

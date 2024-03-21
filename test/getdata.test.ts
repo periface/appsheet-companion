@@ -74,3 +74,20 @@ test('test call data and find value by id', async () => {
         domain: 'yahoo.com'
     })
 });
+test('test generics', async () => {
+    const companion = Init(config);
+    const promise = companion.spreadSheetServices.getDataFromTableAndMap<{id:string, name:string, number:string, email:string, noDomain:string, domain:string}>(tableRequest.NAMES as SheetDataReq);
+    const result = await promise;
+    expect(result.error).toBeUndefined();
+    expect(result.columnSize).toBe(5);
+    expect(result.data.size).toBeGreaterThan(20);
+    expect(result.data.size).toBeLessThanOrEqual(100);
+    expect(result.data.values().next().value).toEqual({
+        id: '89',
+        name: 'Elijah',
+        number: '341,144',
+        email: '89.elijah@yahoo.com',
+        noDomain: '89.elijah@',
+        domain: 'yahoo.com'
+    })
+});
