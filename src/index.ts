@@ -78,7 +78,34 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
     }
 
 }
+const useDataFromTableMap = async <T>(input: SheetDataReq): Promise<> => {
+    const response: GetDataResponseGenericProps<T> = await getDataFromTableAndMap(input);
+    const findByColumnName = (value: string, column: string) => {
+        try {
+            const findResponse: GetElementResponseProps = {} as GetElementResponseProps;
+            const result = findElementByColumnName(value, column, response.data);
+            if (!result) {
+                findResponse.error = 'No se encontró el elemento';
+            }
+            else {
+                findResponse.data = result;
+            }
+            return findResponse;
+        }
+        catch (e: any) {
+            return {
+                error: e.message,
+                data: {} as ColumnValue,
+                rawData: [] as string[][]
+            } as GetElementResponseProps;
+        };
+    }
+    return {
+        response,
+        findByColumnName,
 
+    }
+}
 const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> => {
     const response: GetDataResponseProps = await getDataFromTable(input);
     const findByColumnName = (value: string, column: string) => {
@@ -138,14 +165,17 @@ export { SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDa
 function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();
 }
-const findElementByColumnName = (value: string, column: string, data: Set<ColumnValue>) => {
+const findElementByColumnName =<T>(value: string, column: string, data: Set<ColumnValue | T>) => {
     // using reverse for
     // trim and upper case value
     //
     value = trimAndUpperCase(value);
     for (let element of data) {
-        if (trimAndUpperCase(element[column]) === value) {
-            return element;
+        const columnValue = element[column as keyof ColumnValue | keyof T];
+        if (columnValue) {
+            if (trimAndUpperCase(columnValue as string) === value) {
+                return element;
+            }
         }
     }
 }

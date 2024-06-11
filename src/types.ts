@@ -55,6 +55,10 @@ export type UseDataFromTable = {
     response: GetDataResponseProps,
     findByColumnName: (value: string, column: string) => GetElementResponseProps,
 }
+export type UseDataFromTableMap<T> = {
+    response: GetDataResponseGenericProps<T>,
+    findByColumnName: (value: string, column: string) => GetElementResponseProps,
+}
 export type SpreadSheetServices = {
     getDataFromTable:(input: SheetDataReq)=> Promise<GetDataResponseProps>,
     useDataFromTable:(input: SheetDataReq)=> Promise<UseDataFromTable>
