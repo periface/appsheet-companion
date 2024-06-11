@@ -114,8 +114,9 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
             columnsLength: 0
         };
         if (rows.length) {
-            for (let i = 0; i < rows.length; i++) {
+            for (let i = 0; i <= rows.length; i++) {
                 const rowValues = rows[i];
+                if (!rowValues) continue;
                 if (rowValues.length < columnsLength) {
                     const diff = columnsLength - rowValues.length;
                     for (let j = 0; j < diff; j++) {
@@ -123,10 +124,9 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
                     }
                 }
             }
-          
             return {
                 rows: rows.flat(),
-                columnsLength:  columnsLength || 0
+                columnsLength: columnsLength || 0
             };
         } else {
             return {
@@ -172,7 +172,7 @@ async function getGoogleSheetData(sheetId: string, range: string): Promise<strin
             console.log("[getGoogleSheetData] ERROR " + sheetId + "rango: " + range);
             console.info(error);
         }
-        throw error; 
+        throw error;
     }
 }
 
@@ -275,7 +275,7 @@ async function alternativeDownloadAsStream(docId: string) {
 }
 async function insertGoogleSheetData(docId: string, bookAndRange: string, data: string[][], clear: boolean = false) {
     try {
-        if(clear){
+        if (clear) {
             const clearResponse = await _sheets.spreadsheets.values.clear({
                 spreadsheetId: docId,
                 range: bookAndRange

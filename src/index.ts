@@ -1,11 +1,12 @@
-import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps  } from "./types";
+import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps } from "./types";
 import GoogleApi, { IGoogleApi } from "./google-api";
-let googleApi : IGoogleApi;  
+let googleApi: IGoogleApi;
 const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataResponseGenericProps<T>> => {
     const response = await getDataFromTable(input);
     const data = new Set<T>();
     response.data.forEach((element) => {
-        data.add(element as unknown as T);
+        const convertedElement = element as unknown as T;
+        data.add(convertedElement);
     });
     return {
         data,
@@ -15,22 +16,22 @@ const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataRe
         columnSize: response.columnSize
     };
 }
-const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProps> => {
-         /*    [["1","Hola","Ruth"],["2","Adios","Ruth"]]
-            ["1","Hola","Ruth","2","Adios","Ruth"]
-            //No  Saludo  Nombre
-            //1    2        3
-            [1]  [2]      [3]
-            // cuando llegues al 3, resetea el contador*/
+const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponseProps> => {
+    /*    [["1","Hola","Ruth"],["2","Adios","Ruth"]]
+       ["1","Hola","Ruth","2","Adios","Ruth"]
+       //No  Saludo  Nombre
+       //1    2        3
+       [1]  [2]      [3]
+       // cuando llegues al 3, resetea el contador*/
+    //
+    const table = input;
+    const sheetRange = table.sheetName + '!' + table.sheetRange;
+    const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
     try {
-        const table = input;
-        const sheetRange = table.sheetName + '!' + table.sheetRange;
-        const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
         const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position);
         const dataSet: ColumnValue[] = []; // Cambiado a Array para simplificar el manejo
         const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength - 1;
         const columnLimit = input.totalColumns ? input.totalColumns : spreadSheetColumnsLength;
-
         // No necesitamos calcular totalElements de esta manera ya que será recalculado
         requestedColumns.forEach((column: Column) => {
             if (column.position > spreadSheetColumnsLength) {
@@ -74,26 +75,26 @@ const getDataFromTable= async (input: SheetDataReq): Promise<GetDataResponseProp
             totalRows: 0,
             columnSize: 0
         };
-    }    
-   
+    }
+
 }
 
-const useDataFromTable = async (input: SheetDataReq) : Promise<UseDataFromTable> => {
-    const response: GetDataResponseProps = await getDataFromTable(input);   
+const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> => {
+    const response: GetDataResponseProps = await getDataFromTable(input);
     const findByColumnName = (value: string, column: string) => {
-        try{
-            const findResponse : GetElementResponseProps = {} as GetElementResponseProps;
+        try {
+            const findResponse: GetElementResponseProps = {} as GetElementResponseProps;
 
-           const result = findElementByColumnName(value, column, response.data );
-            if(!result){
+            const result = findElementByColumnName(value, column, response.data);
+            if (!result) {
                 findResponse.error = 'No se encontró el elemento';
             }
-            else{
+            else {
                 findResponse.data = result;
             }
             return findResponse;
         }
-        catch(e: any){
+        catch (e: any) {
             return {
                 error: e.message,
                 data: {} as ColumnValue,
@@ -108,12 +109,12 @@ const useDataFromTable = async (input: SheetDataReq) : Promise<UseDataFromTable>
     }
 }
 const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
-    try{
+    try {
         const bookAndRange = input.sheetName + '!' + input.range;
-        const response =  await googleApi.insertGoogleSheetData(input.googleFileId, bookAndRange, input.data,true);
+        const response = await googleApi.insertGoogleSheetData(input.googleFileId, bookAndRange, input.data, true);
         return response
     }
-    catch(e: any){
+    catch (e: any) {
         throw new Error(e.message);
     }
 
@@ -125,16 +126,16 @@ const spreadSheetServices: SpreadSheetServices = {
     insertDataIntoTable
 }
 
-export const Init = (props:SetupProps) : Companion=>{
-    if(!props.googleApi) throw new Error('googleApi is not defined');
+export const Init = (props: SetupProps): Companion => {
+    if (!props.googleApi) throw new Error('googleApi is not defined');
     googleApi = GoogleApi(props.googleApi);
     return {
         spreadSheetServices
-    } 
+    }
 }
-export {SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput}
+export { SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
 // HELPERS
-function trimAndUpperCase(value: string){
+function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();
 }
 const findElementByColumnName = (value: string, column: string, data: Set<ColumnValue>) => {
@@ -143,9 +144,9 @@ const findElementByColumnName = (value: string, column: string, data: Set<Column
     //
     value = trimAndUpperCase(value);
     for (let element of data) {
-        if(trimAndUpperCase(element[column]) === value){
+        if (trimAndUpperCase(element[column]) === value) {
             return element;
         }
-    }   
+    }
 }
 
