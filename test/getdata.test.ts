@@ -6,6 +6,14 @@ const config: SetupProps = {
         fileName: 'credentials.json',
     }
 }
+type fakeData = {
+    id: string,
+    name: string,
+    number: string,
+    email: string,
+    noDomain: string,
+    domain: string
+}
 const tableRequest: Record<string, SheetDataReq> = {
     NAMES: {
         googleFileId: '1f9ixtL0zNpcclRBYMMUBwu1fJnfm_ckjEIKgIGqG5Xw',
@@ -76,7 +84,7 @@ test('test call data and find value by id', async () => {
 });
 test('test generics', async () => {
     const companion = Init(config);
-    const promise = companion.getDataFromTableAndMap<{ id: string, name: string, number: string, email: string, noDomain: string, domain: string }>(tableRequest.NAMES as SheetDataReq);
+    const promise = companion.getDataFromTableAndMap<fakeData>(tableRequest.NAMES as SheetDataReq);
     const result = await promise;
     expect(result.error).toBeUndefined();
     expect(result.columnSize).toBe(5);
@@ -84,6 +92,27 @@ test('test generics', async () => {
     expect(result.data.size).toBeLessThanOrEqual(100);
     const asArray = Array.from(result.data);
     expect(asArray[88]).toEqual({
+        id: '89',
+        name: 'Elijah',
+        number: '341,144',
+        email: '89.elijah@yahoo.com',
+        noDomain: '89.elijah@',
+        domain: 'yahoo.com'
+    })
+    const lookForMany = companion.findElementByColumnName<fakeData>('89', 'id', result.data, true);
+    const lookFor = companion.findElementByColumnName<fakeData>('89', 'id', result.data, false);
+    expect(lookForMany).not.toBeUndefined();
+    expect(lookForMany?.data).toEqual([{
+        id: '89',
+        name: 'Elijah',
+        number: '341,144',
+        email: '89.elijah@yahoo.com',
+        noDomain: '89.elijah@',
+        domain: 'yahoo.com'
+    }])
+
+    expect(lookFor).not.toBeUndefined();
+    expect(lookFor?.data).toEqual({
         id: '89',
         name: 'Elijah',
         number: '341,144',

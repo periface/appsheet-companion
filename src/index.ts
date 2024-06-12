@@ -78,7 +78,6 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
     }
 
 }
-
 const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> => {
     const response: GetDataResponseProps = await getDataFromTable(input);
     const findByColumnName = (value: string, column: string) => {
@@ -105,13 +104,17 @@ const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> 
     return {
         response,
         findByColumnName,
-
     }
 }
 const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     try {
         const bookAndRange = input.sheetName + '!' + input.range;
-        const response = await googleApi.insertGoogleSheetData(input.googleFileId, bookAndRange, input.data, true);
+        const response = await googleApi
+            .insertGoogleSheetData(
+                input.googleFileId,
+                bookAndRange,
+                input.data,
+                true);
         return response
     }
     catch (e: any) {
@@ -159,7 +162,18 @@ export const Init = (props: SetupProps): Companion => {
         findElementByColumnName: findElementByColumnNameGeneric
     }
 }
-export { GetDataResponseGenericProps, SetupProps, Companion, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
+export {
+    GetDataResponseGenericProps,
+    SetupProps,
+    Companion,
+    SheetDataReq,
+    Column,
+    GetDataResponseProps,
+    ColumnValue,
+    GetElementResponseProps,
+    UseDataFromTable,
+    ReplaceDataTableInput
+}
 // HELPERS
 function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();
