@@ -1,4 +1,4 @@
-import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps } from "./types";
+import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps, GetElementResponseGenericProps } from "./types";
 import GoogleApi, { IGoogleApi } from "./google-api";
 let googleApi: IGoogleApi;
 const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataResponseGenericProps<T>> => {
@@ -78,34 +78,7 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
     }
 
 }
-const useDataFromTableMap = async <T>(input: SheetDataReq): Promise<> => {
-    const response: GetDataResponseGenericProps<T> = await getDataFromTableAndMap(input);
-    const findByColumnName = (value: string, column: string) => {
-        try {
-            const findResponse: GetElementResponseProps = {} as GetElementResponseProps;
-            const result = findElementByColumnName(value, column, response.data);
-            if (!result) {
-                findResponse.error = 'No se encontró el elemento';
-            }
-            else {
-                findResponse.data = result;
-            }
-            return findResponse;
-        }
-        catch (e: any) {
-            return {
-                error: e.message,
-                data: {} as ColumnValue,
-                rawData: [] as string[][]
-            } as GetElementResponseProps;
-        };
-    }
-    return {
-        response,
-        findByColumnName,
 
-    }
-}
 const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> => {
     const response: GetDataResponseProps = await getDataFromTable(input);
     const findByColumnName = (value: string, column: string) => {
@@ -146,11 +119,29 @@ const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     }
 
 }
+const findElementByColumnNameGeneric =<T> (value: string, column: string, data: Set<T>) => {
+    // using reverse for
+    // trim and upper case value
+    //
+    value = trimAndUpperCase(value);
+    for (let element of data) {
+        const columnValue = element[column as keyof T];
+        if (columnValue) {
+            if (trimAndUpperCase(columnValue as string) === value) {
+                return {
+                    data: element,
+                    rawData: [] as string[][],
+                } as GetElementResponseGenericProps<T>;
+            }
+        }
+    }
+}
 const spreadSheetServices: SpreadSheetServices = {
     getDataFromTable,
     getDataFromTableAndMap,
     useDataFromTable,
-    insertDataIntoTable
+    insertDataIntoTable,
+    findElementByColumnName: findElementByColumnNameGeneric
 }
 
 export const Init = (props: SetupProps): Companion => {
@@ -160,18 +151,18 @@ export const Init = (props: SetupProps): Companion => {
         spreadSheetServices
     }
 }
-export { SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
+export {GetDataResponseGenericProps, SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
 // HELPERS
 function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();
 }
-const findElementByColumnName =<T>(value: string, column: string, data: Set<ColumnValue | T>) => {
+const findElementByColumnName = (value: string, column: string, data: Set<ColumnValue>) => {
     // using reverse for
     // trim and upper case value
     //
     value = trimAndUpperCase(value);
     for (let element of data) {
-        const columnValue = element[column as keyof ColumnValue | keyof T];
+        const columnValue = element[column as keyof ColumnValue];
         if (columnValue) {
             if (trimAndUpperCase(columnValue as string) === value) {
                 return element;
