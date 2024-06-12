@@ -1,4 +1,4 @@
-import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps, GetElementResponseGenericProps } from "./types";
+import { ColumnValue, Companion, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps, GetElementResponseGenericProps } from "./types";
 import GoogleApi, { IGoogleApi } from "./google-api";
 let googleApi: IGoogleApi;
 const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataResponseGenericProps<T>> => {
@@ -119,7 +119,7 @@ const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     }
 
 }
-const findElementByColumnNameGeneric =<T> (value: string, column: string, data: Set<T>) => {
+const findElementByColumnNameGeneric = <T>(value: string, column: string, data: Set<T>) => {
     // using reverse for
     // trim and upper case value
     //
@@ -136,22 +136,18 @@ const findElementByColumnNameGeneric =<T> (value: string, column: string, data: 
         }
     }
 }
-const spreadSheetServices: SpreadSheetServices = {
-    getDataFromTable,
-    getDataFromTableAndMap,
-    useDataFromTable,
-    insertDataIntoTable,
-    findElementByColumnName: findElementByColumnNameGeneric
-}
-
 export const Init = (props: SetupProps): Companion => {
     if (!props.googleApi) throw new Error('googleApi is not defined');
     googleApi = GoogleApi(props.googleApi);
     return {
-        spreadSheetServices
+        getDataFromTable,
+        getDataFromTableAndMap,
+        useDataFromTable,
+        insertDataIntoTable,
+        findElementByColumnName: findElementByColumnNameGeneric
     }
 }
-export {GetDataResponseGenericProps, SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
+export { GetDataResponseGenericProps, SetupProps, Companion, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
 // HELPERS
 function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();

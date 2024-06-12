@@ -41,7 +41,7 @@ const tableRequest: Record<string, SheetDataReq> = {
 } as const
 test('data from spreadsheet is called correctly', async () => {
     const companion = Init(config);
-    const promise = companion.spreadSheetServices.useDataFromTable(tableRequest.NAMES as SheetDataReq);
+    const promise = companion.useDataFromTable(tableRequest.NAMES as SheetDataReq);
     const result = await promise;
     console.log(result);
     expect(result.response.error).toBeUndefined();
@@ -51,7 +51,7 @@ test('data from spreadsheet is called correctly', async () => {
 });
 test('test call data and find value by id', async () => {
     const companion = Init(config);
-    const promise = companion.spreadSheetServices.useDataFromTable(tableRequest.NAMES as SheetDataReq);
+    const promise = companion.useDataFromTable(tableRequest.NAMES as SheetDataReq);
     const result = await promise;
     const david = result.findByColumnName('5', 'id');
     const elijah = result.findByColumnName('89', 'id');
@@ -76,7 +76,7 @@ test('test call data and find value by id', async () => {
 });
 test('test generics', async () => {
     const companion = Init(config);
-    const promise = companion.spreadSheetServices.getDataFromTableAndMap<{ id: string, name: string, number: string, email: string, noDomain: string, domain: string }>(tableRequest.NAMES as SheetDataReq);
+    const promise = companion.getDataFromTableAndMap<{ id: string, name: string, number: string, email: string, noDomain: string, domain: string }>(tableRequest.NAMES as SheetDataReq);
     const result = await promise;
     expect(result.error).toBeUndefined();
     expect(result.columnSize).toBe(5);

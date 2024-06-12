@@ -63,15 +63,12 @@ export type UseDataFromTableMap<T> = {
     response: GetDataResponseGenericProps<T>,
     findByColumnName: (value: string, column: string) => GetElementResponseProps,
 }
-export type SpreadSheetServices = {
+export type Companion ={
     getDataFromTable:(input: SheetDataReq)=> Promise<GetDataResponseProps>,
     useDataFromTable:(input: SheetDataReq)=> Promise<UseDataFromTable>
     insertDataIntoTable:(input: ReplaceDataTableInput)=> Promise<any>
     getDataFromTableAndMap:<T>(input: SheetDataReq)=> Promise<GetDataResponseGenericProps<T>>
     findElementByColumnName:<T> (value: string, column: string, data: Set<T>) => GetElementResponseGenericProps<T> | undefined
-}
-export type Companion ={
-    spreadSheetServices:  SpreadSheetServices
 }
 export type ReplaceDataTableInput = {
     sheetName: string;
