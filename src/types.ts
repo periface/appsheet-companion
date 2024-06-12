@@ -37,7 +37,7 @@ export type GetElementResponseProps = {
     rawData: string[][];
 }
 export type GetElementResponseGenericProps<T> = {
-    data: T;
+    data: T | T[];
     error?: string;
     rawData: string[][];
 }

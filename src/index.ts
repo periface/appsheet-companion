@@ -119,23 +119,35 @@ const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     }
 
 }
-const findElementByColumnNameGeneric = <T>(value: string, column: string, data: Set<T>) => {
-    // using reverse for
-    // trim and upper case value
-    //
-    value = trimAndUpperCase(value);
-    for (let element of data) {
-        const columnValue = element[column as keyof T];
-        if (columnValue) {
-            if (trimAndUpperCase(columnValue as string) === value) {
-                return {
-                    data: element,
-                    rawData: [] as string[][],
-                } as GetElementResponseGenericProps<T>;
+const findElementByColumnNameGeneric =
+    <T>(value: string,
+        column: string,
+        data: Set<T>,
+        many: boolean = false) => {
+        value = trimAndUpperCase(value);
+        const arrResult: T[] = [];
+        for (let element of data) {
+            const columnValue = element[column as keyof T];
+            if (columnValue) {
+                if (trimAndUpperCase(columnValue as string) === value) {
+                    if (!many) {
+                        return {
+                            data: element,
+                            rawData: [] as string[][],
+                        } as GetElementResponseGenericProps<T>;
+                    }
+                    arrResult.push(element);
+                }
             }
         }
+        if (many) {
+            return {
+                data: arrResult,
+                rawData: [] as string[][],
+            } as GetElementResponseGenericProps<T>;
+        }
     }
-}
+
 export const Init = (props: SetupProps): Companion => {
     if (!props.googleApi) throw new Error('googleApi is not defined');
     googleApi = GoogleApi(props.googleApi);
