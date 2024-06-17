@@ -1,4 +1,4 @@
-import { ColumnValue, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps } from "./types";
+import { ColumnValue, Companion, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps, GetElementResponseGenericProps } from "./types";
 import GoogleApi, { IGoogleApi } from "./google-api";
 let googleApi: IGoogleApi;
 const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataResponseGenericProps<T>> => {
@@ -17,13 +17,12 @@ const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataRe
     };
 }
 const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponseProps> => {
-    /*    [["1","Hola","Ruth"],["2","Adios","Ruth"]]
-       ["1","Hola","Ruth","2","Adios","Ruth"]
        //No  Saludo  Nombre
        //1    2        3
-       [1]  [2]      [3]
+       //[1]  [2]      [3]
        // cuando llegues al 3, resetea el contador*/
     //
+    validateInput(input);
     const table = input;
     const sheetRange = table.sheetName + '!' + table.sheetRange;
     const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
@@ -78,35 +77,8 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
     }
 
 }
-const useDataFromTableMap = async <T>(input: SheetDataReq): Promise<> => {
-    const response: GetDataResponseGenericProps<T> = await getDataFromTableAndMap(input);
-    const findByColumnName = (value: string, column: string) => {
-        try {
-            const findResponse: GetElementResponseProps = {} as GetElementResponseProps;
-            const result = findElementByColumnName(value, column, response.data);
-            if (!result) {
-                findResponse.error = 'No se encontró el elemento';
-            }
-            else {
-                findResponse.data = result;
-            }
-            return findResponse;
-        }
-        catch (e: any) {
-            return {
-                error: e.message,
-                data: {} as ColumnValue,
-                rawData: [] as string[][]
-            } as GetElementResponseProps;
-        };
-    }
-    return {
-        response,
-        findByColumnName,
-
-    }
-}
 const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> => {
+    validateInput(input)
     const response: GetDataResponseProps = await getDataFromTable(input);
     const findByColumnName = (value: string, column: string) => {
         try {
@@ -132,13 +104,17 @@ const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> 
     return {
         response,
         findByColumnName,
-
     }
 }
 const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     try {
         const bookAndRange = input.sheetName + '!' + input.range;
-        const response = await googleApi.insertGoogleSheetData(input.googleFileId, bookAndRange, input.data, true);
+        const response = await googleApi
+            .insertGoogleSheetData(
+                input.googleFileId,
+                bookAndRange,
+                input.data,
+                true);
         return response
     }
     catch (e: any) {
@@ -146,32 +122,87 @@ const insertDataIntoTable = async (input: ReplaceDataTableInput) => {
     }
 
 }
-const spreadSheetServices: SpreadSheetServices = {
-    getDataFromTable,
-    getDataFromTableAndMap,
-    useDataFromTable,
-    insertDataIntoTable
-}
+const findElementByColumnNameGeneric =
+    <T>(value: string,
+        column: string,
+        data: Set<T>,
+        many: boolean = false) => {
+        if (!data) {
+            throw new Error('data is required');
+        }
+
+        value = trimAndUpperCase(value);
+        const arrResult: T[] = [];
+        for (let element of data) {
+            const columnValue = element[column as keyof T];
+            if (columnValue) {
+                if (trimAndUpperCase(columnValue as string) === value) {
+                    if (!many) {
+                        return {
+                            data: element,
+                            rawData: [] as string[][],
+                        } as GetElementResponseGenericProps<T>;
+                    }
+                    arrResult.push(element);
+                }
+            }
+        }
+        if (many) {
+            return {
+                data: arrResult,
+                rawData: [] as string[][],
+            } as GetElementResponseGenericProps<T>;
+        }
+    }
 
 export const Init = (props: SetupProps): Companion => {
     if (!props.googleApi) throw new Error('googleApi is not defined');
     googleApi = GoogleApi(props.googleApi);
     return {
-        spreadSheetServices
+        getDataFromTable,
+        getDataFromTableAndMap,
+        useDataFromTable,
+        insertDataIntoTable,
+        findElementByColumnName: findElementByColumnNameGeneric
     }
 }
-export { SetupProps, Companion, SpreadSheetServices, SheetDataReq, Column, GetDataResponseProps, ColumnValue, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput }
+export {
+    GetDataResponseGenericProps,
+    SetupProps,
+    Companion,
+    SheetDataReq,
+    Column,
+    GetDataResponseProps,
+    ColumnValue,
+    GetElementResponseProps,
+    UseDataFromTable,
+    ReplaceDataTableInput
+}
 // HELPERS
+function validateInput(input: SheetDataReq) {
+    if (!input.googleFileId) {
+        throw new Error('googleFileId is required');
+    }
+    if (!input.sheetName) {
+        throw new Error('sheetName is required');
+    }
+    if (!input.sheetRange) {
+        throw new Error('sheetRange is required');
+    }
+    if (!input.columns) {
+        throw new Error('columns is required');
+    }
+}
 function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();
 }
-const findElementByColumnName =<T>(value: string, column: string, data: Set<ColumnValue | T>) => {
+const findElementByColumnName = (value: string, column: string, data: Set<ColumnValue>) => {
     // using reverse for
     // trim and upper case value
     //
     value = trimAndUpperCase(value);
     for (let element of data) {
-        const columnValue = element[column as keyof ColumnValue | keyof T];
+        const columnValue = element[column as keyof ColumnValue];
         if (columnValue) {
             if (trimAndUpperCase(columnValue as string) === value) {
                 return element;

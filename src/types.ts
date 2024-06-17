@@ -30,10 +30,14 @@ export type GetDataResponseGenericProps<T> = {
     rawData: string[];
     totalRows: number;
     columnSize: number;
-
 }
 export type GetElementResponseProps = {
     data: ColumnValue;
+    error?: string;
+    rawData: string[][];
+}
+export type GetElementResponseGenericProps<T> = {
+    data: T | T[];
     error?: string;
     rawData: string[][];
 }
@@ -59,14 +63,12 @@ export type UseDataFromTableMap<T> = {
     response: GetDataResponseGenericProps<T>,
     findByColumnName: (value: string, column: string) => GetElementResponseProps,
 }
-export type SpreadSheetServices = {
-    getDataFromTable:(input: SheetDataReq)=> Promise<GetDataResponseProps>,
-    useDataFromTable:(input: SheetDataReq)=> Promise<UseDataFromTable>
-    insertDataIntoTable:(input: ReplaceDataTableInput)=> Promise<any>
-    getDataFromTableAndMap:<T>(input: SheetDataReq)=> Promise<GetDataResponseGenericProps<T>>
-}
-export type Companion ={
-    spreadSheetServices:  SpreadSheetServices
+export type Companion = {
+    getDataFromTable: (input: SheetDataReq) => Promise<GetDataResponseProps>,
+    useDataFromTable: (input: SheetDataReq) => Promise<UseDataFromTable>
+    insertDataIntoTable: (input: ReplaceDataTableInput) => Promise<any>
+    getDataFromTableAndMap: <T>(input: SheetDataReq) => Promise<GetDataResponseGenericProps<T>>
+    findElementByColumnName: <T> (value: string, column: string, data: Set<T>, many: boolean) => GetElementResponseGenericProps<T> | undefined
 }
 export type ReplaceDataTableInput = {
     sheetName: string;
@@ -74,3 +76,4 @@ export type ReplaceDataTableInput = {
     googleFileId: string;
     data: string[][]
 }
+
