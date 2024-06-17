@@ -17,13 +17,12 @@ const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataRe
     };
 }
 const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponseProps> => {
-    /*    [["1","Hola","Ruth"],["2","Adios","Ruth"]]
-       ["1","Hola","Ruth","2","Adios","Ruth"]
        //No  Saludo  Nombre
        //1    2        3
-       [1]  [2]      [3]
+       //[1]  [2]      [3]
        // cuando llegues al 3, resetea el contador*/
     //
+    validateInput(input);
     const table = input;
     const sheetRange = table.sheetName + '!' + table.sheetRange;
     const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
@@ -79,6 +78,7 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
 
 }
 const useDataFromTable = async (input: SheetDataReq): Promise<UseDataFromTable> => {
+    validateInput(input)
     const response: GetDataResponseProps = await getDataFromTable(input);
     const findByColumnName = (value: string, column: string) => {
         try {
@@ -175,6 +175,20 @@ export {
     ReplaceDataTableInput
 }
 // HELPERS
+function validateInput(input: SheetDataReq) {
+    if (!input.googleFileId) {
+        throw new Error('googleFileId is required');
+    }
+    if (!input.sheetName) {
+        throw new Error('sheetName is required');
+    }
+    if (!input.sheetRange) {
+        throw new Error('sheetRange is required');
+    }
+    if (!input.columns) {
+        throw new Error('columns is required');
+    }
+}
 function trimAndUpperCase(value: string) {
     return value.trim().toUpperCase();
 }
