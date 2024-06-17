@@ -127,9 +127,10 @@ const findElementByColumnNameGeneric =
         column: string,
         data: Set<T>,
         many: boolean = false) => {
-        assert(value, 'value is required');
-        assert(column, 'column is required');
-        assert(data, 'data is required');
+        if (!data) {
+            throw new Error('data is required');
+        }
+
         value = trimAndUpperCase(value);
         const arrResult: T[] = [];
         for (let element of data) {
