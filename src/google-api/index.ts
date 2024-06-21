@@ -9,7 +9,7 @@ import { join } from "path";
 import { Readable } from "stream";
 import { Column, GoogleApiConfig } from '../types';
 let _auth: GoogleAuth<JSONClient>;
-let _config: GoogleApiConfig;
+let _config: GoogleApiConfig | string;
 let _debug: boolean | undefined;
 let _drive: drive_v3.Drive;
 let _sheets: sheets_v4.Sheets;
@@ -20,7 +20,7 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
  * @returns GoogleAuth<JSONClient>9-8
  */
 
-function authGoogle(config: GoogleApiConfig): GoogleAuth<JSONClient> {
+function authGoogle(config: GoogleApiConfig | string): GoogleAuth<JSONClient> {
 
     if (_auth) return _auth;
     const jsonDirectory = join(process.cwd(), config.rootFolder as string);
@@ -405,7 +405,7 @@ export type IGoogleApi = {
     getGoogleSheetDataAsFlatArray: typeof getGoogleSheetDataAsFlatArray
 }
 
-const GoogleApi = (config: GoogleApiConfig, debug?: boolean): IGoogleApi => {
+const GoogleApi = (config: GoogleApiConfig | string, debug?: boolean): IGoogleApi => {
     _config = config;
     _debug = debug;
     _auth = authGoogle(config);

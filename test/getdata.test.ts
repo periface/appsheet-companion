@@ -1,6 +1,7 @@
 import { Init, type SetupProps, SheetDataReq } from "../src";
 // yeh, i dont like testing, if it works, it works
 const config: SetupProps = {
+    credentials : './credentials/credentials.json',
     googleApi: {
         rootFolder: './credentials',
         fileName: 'credentials.json',
@@ -46,10 +47,6 @@ const tableRequest: Record<string, SheetDataReq> = {
         }
         ]
     },
-    NAMES_NO_COLUMNS: {
-        googleFileId: '1f9ixtL0zNpcclRBYMMUBwu1fJnfm_ckjEIKgIGqG5Xw',
-        sheetName: 'Names',
-    }
 } as { [key: string]: SheetDataReq };
 test('data from spreadsheet is called correctly', async () => {
     const companion = Init(config);
@@ -127,7 +124,10 @@ test('test generics', async () => {
 });
 test("no columns", async () => {
     const companion = Init(config);
-    const promise = companion.getDataFromTableAndMap<fakeData>(tableRequest.NAMES_NO_COLUMNS as SheetDataReq);
+    const promise = companion.getDataFromTableAndMap<fakeData>({
+        googleFileId: '1f9ixtL0zNpcclRBYMMUBwu1fJnfm_ckjEIKgIGqG5Xw',
+        sheetName: 'Names',
+    });
     const result = await promise;
     expect(result.error).toBeUndefined();
     expect(result.columnSize).toBe(5);
