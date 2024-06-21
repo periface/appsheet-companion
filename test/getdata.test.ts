@@ -46,7 +46,11 @@ const tableRequest: Record<string, SheetDataReq> = {
         }
         ]
     },
-} as const
+    NAMES_NO_COLUMNS: {
+        googleFileId: '1f9ixtL0zNpcclRBYMMUBwu1fJnfm_ckjEIKgIGqG5Xw',
+        sheetName: 'Names',
+    }
+} as { [key: string]: SheetDataReq };
 test('data from spreadsheet is called correctly', async () => {
     const companion = Init(config);
     const promise = companion.useDataFromTable(tableRequest.NAMES as SheetDataReq);
@@ -120,4 +124,14 @@ test('test generics', async () => {
         noDomain: '89.elijah@',
         domain: 'yahoo.com'
     })
+});
+test("no columns", async () => {
+    const companion = Init(config);
+    const promise = companion.getDataFromTableAndMap<fakeData>(tableRequest.NAMES_NO_COLUMNS as SheetDataReq);
+    const result = await promise;
+    expect(result.error).toBeUndefined();
+    expect(result.columnSize).toBe(5);
+    expect(result.data.size).toBeGreaterThan(20);
+    expect(result.data.size).toBeLessThanOrEqual(100);
+    console.log(result);
 });

@@ -13,21 +13,32 @@ const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataRe
         error: response.error,
         rawData: response.rawData,
         totalRows: response.totalRows,
-        columnSize: response.columnSize
+        columnSize: response.columnSize,
+        columns: response.columns
     };
 }
 const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponseProps> => {
-       //No  Saludo  Nombre
-       //1    2        3
-       //[1]  [2]      [3]
-       // cuando llegues al 3, resetea el contador*/
+    //No  Saludo  Nombre
+    //1    2        3
+    //[1]  [2]      [3]
+    // cuando llegues al 3, resetea el contador*/
     //
     validateInput(input);
     const table = input;
-    const sheetRange = table.sheetName + '!' + table.sheetRange;
-    const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, sheetRange);
+    let sheetRange = 'A1:ZZ';
+    if (table.sheetRange) {
+        sheetRange = table.sheetRange;
+    }
+    const concatRange = table.sheetName + '!' + sheetRange ?? 'A1:ZZ';
+    let requestedColumns: Column[] = []
+    const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, concatRange);
     try {
-        const requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position);
+        if (table.columns) {
+            requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position);
+        }
+        else {
+            requestedColumns = rawSpreadSheetData.columns;
+        }
         const dataSet: ColumnValue[] = []; // Cambiado a Array para simplificar el manejo
         const spreadSheetColumnsLength = rawSpreadSheetData.columnsLength - 1;
         const columnLimit = input.totalColumns ? input.totalColumns : spreadSheetColumnsLength;
@@ -63,7 +74,8 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
             rawData: rawSpreadSheetData.rows,
             error: undefined,
             totalRows: dataSet.length, // Actualizar totalRows para reflejar el número de objetos únicos
-            columnSize: spreadSheetColumnsLength
+            columnSize: spreadSheetColumnsLength,
+            columns: requestedColumns
         };
     } catch (e: any) {
         console.log('error', e.message);
@@ -72,7 +84,8 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
             error: e.message,
             rawData: [],
             totalRows: 0,
-            columnSize: 0
+            columnSize: 0,
+            columns: requestedColumns
         };
     }
 
@@ -185,12 +198,6 @@ function validateInput(input: SheetDataReq) {
     }
     if (!input.sheetName) {
         throw new Error('sheetName is required');
-    }
-    if (!input.sheetRange) {
-        throw new Error('sheetRange is required');
-    }
-    if (!input.columns) {
-        throw new Error('columns is required');
     }
 }
 function trimAndUpperCase(value: string) {

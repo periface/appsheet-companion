@@ -11,9 +11,9 @@ export type Column = {
 
 export type SheetDataReq = {
     sheetName: string;
-    sheetRange: string;
+    sheetRange?: string;
     googleFileId: string;
-    columns: Column[];
+    columns?: Column[];
     onEmptyFieldStringValue?: string;
     totalColumns?: number;
 }
@@ -23,6 +23,7 @@ export type GetDataResponseProps = {
     rawData: string[];
     totalRows: number;
     columnSize: number;
+    columns: Column[];
 }
 export type GetDataResponseGenericProps<T> = {
     data: Set<T>;
@@ -30,6 +31,7 @@ export type GetDataResponseGenericProps<T> = {
     rawData: string[];
     totalRows: number;
     columnSize: number;
+    columns: Column[];
 }
 export type GetElementResponseProps = {
     data: ColumnValue;

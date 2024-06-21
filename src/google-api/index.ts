@@ -7,7 +7,7 @@ import type { JSONClient } from "google-auth-library/build/src/auth/googleauth";
 import { drive_v3, Auth, sheets_v4, docs_v1 } from "googleapis";
 import { join } from "path";
 import { Readable } from "stream";
-import { GoogleApiConfig } from '../types';
+import { Column, GoogleApiConfig } from '../types';
 let _auth: GoogleAuth<JSONClient>;
 let _config: GoogleApiConfig;
 let _debug: boolean | undefined;
@@ -94,7 +94,7 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
     rows: string[],
     columnsLength: number
-
+    columns: Column[]
 }> {
     try {
         const response = await _sheets.spreadsheets.values.get({
@@ -104,14 +104,23 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
         const rows = response.data.values;
         if (!rows) return {
             rows: [],
-            columnsLength: 0
+            columnsLength: 0,
+            columns: []
         };
         const columnsLength = rows[0].length;
+        const columns = rows[0].map((column, index) => {
+            const columnName = column.replace(/\s/g, "_").toLowerCase();
+            return {
+                name: columnName,
+                position: index
+            } as Column;
+        })
         // remove first row
         rows.shift();
         if (!rows) return {
             rows: [],
-            columnsLength: 0
+            columnsLength: 0,
+            columns: []
         };
         if (rows.length) {
             for (let i = 0; i <= rows.length; i++) {
@@ -126,12 +135,14 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
             }
             return {
                 rows: rows.flat(),
-                columnsLength: columnsLength || 0
+                columnsLength: columnsLength || 0,
+                columns
             };
         } else {
             return {
                 rows: [],
-                columnsLength: 0
+                columnsLength: 0,
+                columns: []
             };
         }
     } catch (error) {
