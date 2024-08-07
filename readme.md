@@ -18,7 +18,7 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
 [Lo puedes conseguir aquí](https://cloud.google.com/iam/docs/keys-create-delete?hl=es-419)
 **2.- Id del Spreadsheet**
 **3.- Nombre de la Hoja**
-**4.- Un buen nombre para cada columna dentro de tu código ;)**
+**4.- Un nombre para cada columna dentro de tu código**
 
 ![ejemplo2](https://drive.usercontent.google.com/download?id=1C7fExBiyISIu1DKcTLJ1G4YFUBZF6iFz&authuser=0, "Ejemplo2")
 
@@ -30,16 +30,19 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
  `yarn add appsheet-companion`
 
 **Uso**
-```
-    import { Init, type Companion, type SheetDataReq} from 'appsheet-companion'
-    async function main(){
-        const companion = Init({
-            credentials: 'path/to/credentials.json'
-        });
-        const usersRequest:SheetDataReq = {
-            sheetName:'USERS',// hoja dentro del spreadsheet
-            sheetRange:'A2:ZZ',
+```js
+import { Init, type Companion, type SheetDataReq} from 'appsheet-companion'
+async function main(){
+    const companion = Init({
+        credentials: 'path/to/credentials.json'
+    });
+    const usersRequest:SheetDataReq = {
+        sheetName:'USERS',// hoja dentro del spreadsheet
+        sheetRange:'A2:ZZ',
             googleFileId:'1_1qQIS-cZhQqjhPQmnwevrjOKuBJo8G6-G-p5hIwjXc', // id del spreadsheet
+            // opcional, si no se especifica, se toman los nombres de las columnas de la primera fila de la hoja
+            // y se procesan como underscore_case
+            // ej. Nombre de columna: 'Nombre de Usuario' -> nombre_de_usuario
             columns:[{
                 position:0,
                 name:'id',
@@ -61,13 +64,12 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
         console.log(usersTable.response.rawData); // Datos recibidos de la tabla en formato string[][]
         console.log(usersTable.response.data); // Datos recibidos de la tabla convertidos a objetos
         /* ej.
-        [{
-            id:'1',
-            nombre:'Alan',
-            apellido:'Torres',
-            email:'a@a.com'
-        }]
+         [{
+             id:'1',
+             nombre:'Alan',
+             apellido:'Torres',
+             email:'a@a.com'
+         }]
         */
     }
-
 ```
