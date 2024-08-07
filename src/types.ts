@@ -1,9 +1,5 @@
 export type SetupProps = {
     credentials: string;
-    /*
-     * Deprecated
-     * */
-    googleApi: GoogleApiConfig;
 }
 export type ColumnValue = {
     [key: string]: string;

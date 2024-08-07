@@ -7,9 +7,9 @@ import type { JSONClient } from "google-auth-library/build/src/auth/googleauth";
 import { drive_v3, Auth, sheets_v4, docs_v1 } from "googleapis";
 import { join } from "path";
 import { Readable } from "stream";
-import { Column, GoogleApiConfig } from '../types';
+import { Column } from '../types';
 let _auth: GoogleAuth<JSONClient>;
-let _config: GoogleApiConfig | string;
+let _credentials: string;
 let _debug: boolean | undefined;
 let _drive: drive_v3.Drive;
 let _sheets: sheets_v4.Sheets;
@@ -20,12 +20,11 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
  * @returns GoogleAuth<JSONClient>9-8
  */
 
-function authGoogle(config: GoogleApiConfig | string): GoogleAuth<JSONClient> {
-
+function authGoogle(credentials: string): GoogleAuth<JSONClient> {
     if (_auth) return _auth;
-    const jsonDirectory = join(process.cwd(), config.rootFolder as string);
+    const credentialsFile = join(process.cwd(), credentials);
     _auth = new Auth.GoogleAuth({
-        keyFile: join(jsonDirectory, config.fileName as string),
+        keyFile: credentialsFile,
         scopes: SCOPES
     });
 
@@ -34,7 +33,7 @@ function authGoogle(config: GoogleApiConfig | string): GoogleAuth<JSONClient> {
 function getSheetsInstance() {
     if (_sheets) return _sheets;
 
-    const auth = authGoogle(_config);
+    const auth = authGoogle(_credentials);
     const sheets = new sheets_v4.Sheets({ auth: auth });
     _sheets = sheets;
     return _sheets;
@@ -42,7 +41,7 @@ function getSheetsInstance() {
 function getDriveInstance() {
     if (_drive) return _drive;
 
-    const auth = authGoogle(_config);
+    const auth = authGoogle(_credentials);
     const drive = new drive_v3.Drive({ auth: auth });
     _drive = drive;
     return drive;
@@ -50,7 +49,7 @@ function getDriveInstance() {
 function getDocsInstance() {
     if (_docs) return _docs;
 
-    const auth = authGoogle(_config);
+    const auth = authGoogle(_credentials);
     const docs = new docs_v1.Docs({ auth: auth });
     _docs = docs;
     return _docs;
@@ -63,7 +62,7 @@ function getDocsInstance() {
  */
 async function readAndUpload(fileName: string, buf: Buffer, mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", folderId: string) {
     try {
-        const auth = authGoogle(_config);
+        const auth = authGoogle(_credentials);
         const drive = new drive_v3.Drive({ auth: auth });
         const fileMetadata = {
             name: fileName,
@@ -405,10 +404,10 @@ export type IGoogleApi = {
     getGoogleSheetDataAsFlatArray: typeof getGoogleSheetDataAsFlatArray
 }
 
-const GoogleApi = (config: GoogleApiConfig | string, debug?: boolean): IGoogleApi => {
-    _config = config;
+const GoogleApi = (credentials: string, debug?: boolean): IGoogleApi => {
+    _credentials = credentials;
     _debug = debug;
-    _auth = authGoogle(config);
+    _auth = authGoogle(credentials);
     _drive = getDriveInstance();
     _sheets = getSheetsInstance();
     _docs = getDocsInstance();

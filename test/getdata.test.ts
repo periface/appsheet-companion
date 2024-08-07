@@ -2,10 +2,6 @@ import { Init, type SetupProps, SheetDataReq } from "../src";
 // yeh, i dont like testing, if it works, it works
 const config: SetupProps = {
     credentials : './credentials/credentials.json',
-    googleApi: {
-        rootFolder: './credentials',
-        fileName: 'credentials.json',
-    }
 }
 type fakeData = {
     id: string,

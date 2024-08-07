@@ -169,8 +169,8 @@ const findElementByColumnNameGeneric =
     }
 
 export const Init = (props: SetupProps): Companion => {
-    if (!props.googleApi) throw new Error('googleApi is not defined');
-    googleApi = GoogleApi(props.googleApi);
+    if (!props.credentials) throw new Error('credentials file required');
+    googleApi = GoogleApi(props.credentials);
     return {
         getDataFromTable,
         getDataFromTableAndMap,
