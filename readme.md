@@ -1,4 +1,4 @@
-# TS-NODE AppSheetCompanion 
+# TS-NODE AppSheetCompanion
 
 ## Herramienta para migración de datos almacenados en la plataforma Appsheets
 # Introducción
@@ -14,11 +14,11 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
 ![ejemplo1](https://drive.usercontent.google.com/download?id=1H-GWpWBcQOTvioUfAq3-W4qtwbEjWgiv&authuser=0, "Ejemplo 1")
 
 ### Que necesitamos?
-**1.- Archivo Credentials.json de Google** 
-[Lo puedes conseguir aquí](https://cloud.google.com/iam/docs/keys-create-delete?hl=es-419)  
-**2.- Id del Spreadsheet**  
-**3.- Nombre de la Hoja**  
-**4.- Un buen nombre para cada columna dentro de tu código ;)**  
+**1.- Archivo Credentials.json de Google**
+[Lo puedes conseguir aquí](https://cloud.google.com/iam/docs/keys-create-delete?hl=es-419)
+**2.- Id del Spreadsheet**
+**3.- Nombre de la Hoja**
+**4.- Un buen nombre para cada columna dentro de tu código ;)**
 
 ![ejemplo2](https://drive.usercontent.google.com/download?id=1C7fExBiyISIu1DKcTLJ1G4YFUBZF6iFz&authuser=0, "Ejemplo2")
 
@@ -34,10 +34,7 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
     import { Init, type Companion, type SheetDataReq} from 'appsheet-companion'
     async function main(){
         const companion = Init({
-            googleApi:{
-                rootFolder:'google', // not the sharpest tool in the shed
-                fileName:'credentials.json' // not the sharpest tool in the shed
-            }
+            credentials: 'path/to/credentials.json'
         });
         const usersRequest:SheetDataReq = {
             sheetName:'USERS',// hoja dentro del spreadsheet
@@ -63,7 +60,7 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
         const usersTable = companion.spreadSheetServices.useDataFromTable(usersRequest);
         console.log(usersTable.response.rawData); // Datos recibidos de la tabla en formato string[][]
         console.log(usersTable.response.data); // Datos recibidos de la tabla convertidos a objetos
-        /* ej. 
+        /* ej.
         [{
             id:'1',
             nombre:'Alan',
@@ -71,6 +68,6 @@ Imagina que tenemos una base de datos de usuarios en un archivo de spreadsheets
             email:'a@a.com'
         }]
         */
-    }   
+    }
 
 ```
