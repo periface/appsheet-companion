@@ -94,7 +94,7 @@ function cleanVariableName(variableName: string) {
     return variableName
         .normalize("NFD")                   // Descompone caracteres con acento en base + acento
         .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
-        .replace(/[^\w\s]/g, '')            // Elimina cualquier carácter que no sea alfanumérico o espacio
+        .replace(/[^\w\s]/g, '')           // Elimina cualquier carácter que no sea alfanumérico, espacio o guion bajo
         .replace(/\s+/g, '_');
 }
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
