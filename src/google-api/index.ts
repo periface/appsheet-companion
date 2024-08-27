@@ -90,13 +90,6 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
         throw error;
     }
 }
-function cleanVariableName(variableName: string) {
-    return variableName
-        .normalize("NFD")                   // Descompone caracteres con acento en base + acento
-        .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
-        .replace(/[^a-zA-Z0-9_ ]/g, '')     // Elimina cualquier carácter que no sea alfanumérico, guion bajo o espacio
-        .replace(/\s+/g, '_');
-}
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
     rows: string[],
     columnsLength: number
@@ -115,7 +108,14 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
         };
         const columnsLength = rows[0].length;
         const columns = rows[0].map((column, index) => {
-            const columnName = cleanVariableName(column);
+
+            // remove . and spaces
+            let columnName = column.replace(/\s/g, ".").toLowerCase();
+            // remove _ and spaces
+            columnName = columnName.replace(/\s/g, "_").toLowerCase();
+            columnName = columnName.normalize("NFD")                   // Descompone caracteres con acento en base + acento
+                .replace(/[\u0300-\u036f]/g, "")
+
             return {
                 name: columnName,
                 position: index
