@@ -91,7 +91,7 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
     }
 }
 
-function cleanVariableName(variableName) {
+function cleanVariableName(variableName:string) {
     return variableName
         .normalize("NFD")                   // Descompone caracteres con acento en base + acento
         .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
@@ -120,7 +120,7 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
 
             const columnName = cleanVariableName(column);
             return {
-                name: columnName,
+                name: columnName.toLowerCase(),
                 position: index
             } as Column;
         })
