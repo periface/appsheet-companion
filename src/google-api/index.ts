@@ -108,7 +108,19 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
         };
         const columnsLength = rows[0].length;
         const columns = rows[0].map((column, index) => {
-            const columnName = column.replace(/\s/g, "_").toLowerCase();
+
+            // remove . and spaces
+            let columnName = column.replace(/\s/g, ".").toLowerCase();
+            // remove _ and spaces
+            columnName = column.replace(/\s/g, "_").toLowerCase();
+            // remove () and spaces
+            columnName = column.replace(/\s/g, "(").toLowerCase();
+            // remove ) and spaces
+            columnName = column.replace(/\s/g, ")").toLowerCase();
+            // remove accents
+            columnName = column.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            // remove special characters
+            columnName = column.replace(/[^a-zA-Z0-9]/g, "");
             return {
                 name: columnName,
                 position: index
