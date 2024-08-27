@@ -94,12 +94,8 @@ function cleanVariableName(variableName: string) {
     return variableName
         .normalize("NFD")                   // Descompone caracteres con acento en base + acento
         .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
-        .replace(/_\/_/g, '_')              // Reemplaza '_/_' con '_'
-        .replace(/\./g, '')                // Reemplaza '._' con ''
-        .replace(/\./g, '')
-        .replace(/\(/g, '')                 // Elimina '('
-        .replace(/\)/g, '')
-        .replace(/\s+/g, '_');                // Elimina ')'
+        .replace(/[^\w\s]/g, '')            // Elimina cualquier carácter que no sea alfanumérico o espacio
+        .replace(/\s+/g, '_');
 }
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
     rows: string[],
