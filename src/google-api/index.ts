@@ -98,8 +98,7 @@ function cleanVariableName(variableName: string) {
         .replace(/\._/g, '')                // Reemplaza '._' con ''
         .replace(/\_./g, '')
         .replace(/\(/g, '')                 // Elimina '('
-        .replace(/\)/g, '').
-        replace(/[^\w\s]/g, '')            // Elimina cualquier carácter que no sea alfanumérico o espacio
+        .replace(/\)/g, '')
         .replace(/\s+/g, '_');                // Elimina ')'
 }
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
