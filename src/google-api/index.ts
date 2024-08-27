@@ -113,8 +113,6 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
             let columnName = column.replace(/\s/g, ".").toLowerCase();
             // remove _ and spaces
             columnName = columnName.replace(/\s/g, "_").toLowerCase();
-            columnName = columnName.normalize("NFD")                   // Descompone caracteres con acento en base + acento
-                .replace(/[\u0300-\u036f]/g, "")
 
             return {
                 name: columnName,
