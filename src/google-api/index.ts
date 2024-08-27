@@ -90,6 +90,18 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
         throw error;
     }
 }
+function cleanVariableName(variableName: string) {
+    return variableName
+        .normalize("NFD")                   // Descompone caracteres con acento en base + acento
+        .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
+        .replace(/_\/_/g, '_')              // Reemplaza '_/_' con '_'
+        .replace(/\._/g, '')                // Reemplaza '._' con ''
+        .replace(/\_./g, '')
+        .replace(/\(/g, '')                 // Elimina '('
+        .replace(/\)/g, '').
+        replace(/[^\w\s]/g, '')            // Elimina cualquier carácter que no sea alfanumérico o espacio
+        .replace(/\s+/g, '_');                // Elimina ')'
+}
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
     rows: string[],
     columnsLength: number
@@ -108,19 +120,7 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
         };
         const columnsLength = rows[0].length;
         const columns = rows[0].map((column, index) => {
-
-            // remove . and spaces
-            let columnName = column.replace(/\s/g, ".").toLowerCase();
-            // remove _ and spaces
-            columnName = column.replace(/\s/g, "_").toLowerCase();
-            // remove () and spaces
-            columnName = column.replace(/\s/g, "(").toLowerCase();
-            // remove ) and spaces
-            columnName = column.replace(/\s/g, ")").toLowerCase();
-            // remove accents
-            columnName = column.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            // remove special characters
-            columnName = column.replace(/[^a-zA-Z0-9]/g, "");
+            const columnName = cleanVariableName(column);
             return {
                 name: columnName,
                 position: index
