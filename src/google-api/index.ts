@@ -95,8 +95,8 @@ function cleanVariableName(variableName: string) {
         .normalize("NFD")                   // Descompone caracteres con acento en base + acento
         .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
         .replace(/_\/_/g, '_')              // Reemplaza '_/_' con '_'
-        .replace(/\._/g, '')                // Reemplaza '._' con ''
-        .replace(/\_./g, '')
+        .replace(/\./g, '')                // Reemplaza '._' con ''
+        .replace(/\./g, '')
         .replace(/\(/g, '')                 // Elimina '('
         .replace(/\)/g, '')
         .replace(/\s+/g, '_');                // Elimina ')'
