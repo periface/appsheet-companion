@@ -17,7 +17,7 @@
         "build": "tsup src/index.ts",
         "copy": "copyfiles -u 1 \"src/**/*.d.ts\" dist",
         "prepublish": "npm run build && npm run copy",
-        "buildandpublish": "npm run build && npm run copy && npm publish"
+        "buildandpublish": "npm run build && npm run copy && npm version patch && npm publish"
     },
     "keywords": [
         "appsheet",
