@@ -97,10 +97,9 @@ function cleanVariableName(variableName: string) {
         .normalize("NFD")                   // Descompone caracteres con acento en base + acento
         .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
         .replace(/[^a-zA-Z0-9_ ]/g, '')     // Elimina cualquier carácter que no sea alfanumérico, guion bajo o espacio
-        .replace(/\s+/g, '_');
-    new_variableName = new_variableName.replace(/[0-9]/g, '');
-    // replace spaces with underscores
-    new_variableName = new_variableName.replace(/ /g, "_");
+        .replace(/\s+/g, '_')
+        .replace(/[0-9]/g, '')
+        .replace(/ /g, "_");
     return new_variableName;
 }
 
