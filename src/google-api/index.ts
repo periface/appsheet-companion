@@ -91,12 +91,19 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
     }
 }
 
-function cleanVariableName(variableName:string) {
-    return variableName
+function cleanVariableName(variableName: string, remove_numbers: boolean = true) {
+    let new_variableName = variableName;
+    new_variableName
         .normalize("NFD")                   // Descompone caracteres con acento en base + acento
         .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
         .replace(/[^a-zA-Z0-9_ ]/g, '')     // Elimina cualquier carácter que no sea alfanumérico, guion bajo o espacio
-        .replace(/\s+/g, '_');              // Reemplaza espacios por '_'
+        .replace(/\s+/g, '_');
+    if (remove_numbers) {
+        new_variableName = new_variableName.replace(/[0-9]/g, '');
+    }
+    // replace spaces with underscores
+    new_variableName = new_variableName.replace(/ /g, "_");
+    return new_variableName;
 }
 
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
