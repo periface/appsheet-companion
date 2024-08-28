@@ -71,6 +71,9 @@ export type Companion = {
     insertDataIntoTable: (input: ReplaceDataTableInput) => Promise<any>
     getDataFromTableAndMap: <T>(input: SheetDataReq) => Promise<GetDataResponseGenericProps<T>>
     findElementByColumnName: <T> (value: string, column: string, data: Set<T>, many: boolean) => GetElementResponseGenericProps<T> | undefined
+    helpers: {
+        cleanVariableName: (name: string) => string
+    }
 }
 export type ReplaceDataTableInput = {
     sheetName: string;

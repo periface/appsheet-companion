@@ -1,5 +1,6 @@
 import { ColumnValue, Companion, SheetDataReq, Column, GetDataResponseProps, SetupProps, GetElementResponseProps, UseDataFromTable, ReplaceDataTableInput, GetDataResponseGenericProps, GetElementResponseGenericProps } from "./types";
 import GoogleApi, { IGoogleApi } from "./google-api";
+import cleanVariableName from "../lib/variable-generador";
 let googleApi: IGoogleApi;
 const getDataFromTableAndMap = async <T>(input: SheetDataReq): Promise<GetDataResponseGenericProps<T>> => {
     const response = await getDataFromTable(input);
@@ -176,7 +177,10 @@ export const Init = (props: SetupProps): Companion => {
         getDataFromTableAndMap,
         useDataFromTable,
         insertDataIntoTable,
-        findElementByColumnName: findElementByColumnNameGeneric
+        findElementByColumnName: findElementByColumnNameGeneric,
+        helpers: {
+            cleanVariableName
+        }
     }
 }
 export {
@@ -189,7 +193,8 @@ export {
     ColumnValue,
     GetElementResponseProps,
     UseDataFromTable,
-    ReplaceDataTableInput
+    ReplaceDataTableInput,
+
 }
 // HELPERS
 function validateInput(input: SheetDataReq) {
