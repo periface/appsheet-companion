@@ -8,6 +8,7 @@ import { drive_v3, Auth, sheets_v4, docs_v1 } from "googleapis";
 import { join } from "path";
 import { Readable } from "stream";
 import { Column } from '../types';
+import cleanVariableName from '../../lib/variable-generador';
 let _auth: GoogleAuth<JSONClient>;
 let _credentials: string;
 let _debug: boolean | undefined;
@@ -91,24 +92,6 @@ async function readAndUpload(fileName: string, buf: Buffer, mimeType = "applicat
     }
 }
 
-function cleanVariableName(variableName: string, remove_numbers: boolean = true) {
-    let new_variableName = variableName;
-    new_variableName
-        .normalize("NFD")                   // Descompone caracteres con acento en base + acento
-        .replace(/[\u0300-\u036f]/g, "")    // Remueve los acentos
-        .replace(/[^a-zA-Z0-9_ ]/g, '')     // Elimina cualquier carácter que no sea alfanumérico, guion bajo o espacio
-        .replace(/\s+/g, '_');
-    if (remove_numbers) {
-        new_variableName = new_variableName.replace(/[0-9]/g, '');
-    }
-    // remove dots
-    new_variableName = new_variableName.replace(/\./g, "");
-    // replace spaces with underscores
-    new_variableName = new_variableName.replace(/ /g, "_");
-    // remove () and []
-    new_variableName = new_variableName.replace(/[\(\)\[\]]/g, "__");
-    return new_variableName;
-}
 
 async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Promise<{
     rows: string[],

@@ -1,7 +1,7 @@
 import { Init, type SetupProps, SheetDataReq } from "../src";
 // yeh, i dont like testing, if it works, it works
 const config: SetupProps = {
-    credentials : './credentials/credentials.json',
+    credentials: './credentials/credentials.json',
 }
 type fakeData = {
     id: string,
@@ -40,6 +40,14 @@ const tableRequest: Record<string, SheetDataReq> = {
         {
             position: 5,
             name: 'domain'
+        },
+        {
+            position: 6,
+            name: 'test_consiliacion'
+        },
+        {
+            position: 7,
+            name: 'variable_vacia'
         }
         ]
     },
@@ -50,7 +58,7 @@ test('data from spreadsheet is called correctly', async () => {
     const result = await promise;
     console.log(result);
     expect(result.response.error).toBeUndefined();
-    expect(result.response.columnSize).toBe(5);
+    expect(result.response.columnSize).toBe(7);
     expect(result.response.data.size).toBeGreaterThan(20);
     expect(result.response.data.size).toBeLessThanOrEqual(100);
 });
@@ -68,7 +76,9 @@ test('test call data and find value by id', async () => {
         number: '3,564,272',
         email: '5.david@yahoo.com',
         noDomain: '5.david@',
-        domain: 'yahoo.com'
+        domain: 'yahoo.com',
+        test_consiliacion: '1234',
+        variable_vacia: '2'
     });
     expect(elijah.data).toEqual({
         id: '89',
@@ -76,7 +86,9 @@ test('test call data and find value by id', async () => {
         number: '341,144',
         email: '89.elijah@yahoo.com',
         noDomain: '89.elijah@',
-        domain: 'yahoo.com'
+        domain: 'yahoo.com',
+        test_consiliacion: '1234',
+        variable_vacia: '2'
     })
 });
 test('test generics', async () => {
@@ -84,7 +96,7 @@ test('test generics', async () => {
     const promise = companion.getDataFromTableAndMap<fakeData>(tableRequest.NAMES as SheetDataReq);
     const result = await promise;
     expect(result.error).toBeUndefined();
-    expect(result.columnSize).toBe(5);
+    expect(result.columnSize).toBe(7);
     expect(result.data.size).toBeGreaterThan(20);
     expect(result.data.size).toBeLessThanOrEqual(100);
     const asArray = Array.from(result.data);
@@ -94,7 +106,9 @@ test('test generics', async () => {
         number: '341,144',
         email: '89.elijah@yahoo.com',
         noDomain: '89.elijah@',
-        domain: 'yahoo.com'
+        domain: 'yahoo.com',
+        test_consiliacion: '1234',
+        variable_vacia: '2'
     })
     const lookForMany = companion.findElementByColumnName<fakeData>('89', 'id', result.data, true);
     const lookFor = companion.findElementByColumnName<fakeData>('89', 'id', result.data, false);
@@ -105,7 +119,9 @@ test('test generics', async () => {
         number: '341,144',
         email: '89.elijah@yahoo.com',
         noDomain: '89.elijah@',
-        domain: 'yahoo.com'
+        domain: 'yahoo.com',
+        test_consiliacion: '1234',
+        variable_vacia: '2'
     }])
 
     expect(lookFor).not.toBeUndefined();
@@ -115,7 +131,9 @@ test('test generics', async () => {
         number: '341,144',
         email: '89.elijah@yahoo.com',
         noDomain: '89.elijah@',
-        domain: 'yahoo.com'
+        domain: 'yahoo.com',
+        test_consiliacion: '1234',
+        variable_vacia: '2'
     })
 });
 test("no columns", async () => {
@@ -124,9 +142,14 @@ test("no columns", async () => {
         googleFileId: '1f9ixtL0zNpcclRBYMMUBwu1fJnfm_ckjEIKgIGqG5Xw',
         sheetName: 'Names',
     });
+
     const result = await promise;
+    const getColumnPosition6 = result.columns.find(column => column.position === 6);
+    expect(getColumnPosition6?.name).toBe("test_consiliacion");
+    const getColumnPosition7 = result.columns.find(column => column.position === 7);
+    expect(getColumnPosition7?.name).toBe("variable_vacia");
     expect(result.error).toBeUndefined();
-    expect(result.columnSize).toBe(5);
+    expect(result.columnSize).toBe(7);
     expect(result.data.size).toBeGreaterThan(20);
     expect(result.data.size).toBeLessThanOrEqual(100);
     console.log(result);
