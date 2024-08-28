@@ -106,7 +106,8 @@ function cleanVariableName(variableName: string, remove_numbers: boolean = true)
     // replace spaces with underscores
     new_variableName = new_variableName.replace(/ /g, "_");
     // remove () and []
-    new_variableName = new_variableName.replace(/[\(\)\[\]]/g, "__");
+    new_variableName = new_variableName.replace(/[\(\)\[\]]/g, "");
+    console.log(new_variableName);
     return new_variableName;
 }
 
