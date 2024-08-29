@@ -206,6 +206,7 @@ function validateInput(input: SheetDataReq) {
     }
 }
 function trimAndUpperCase(value: string) {
+    if (!value) return '__EMPTY__';
     return value.trim().toUpperCase();
 }
 const findElementByColumnName = (value: string, column: string, data: Set<ColumnValue>) => {
