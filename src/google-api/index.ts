@@ -114,7 +114,7 @@ async function getGoogleSheetDataAsFlatArray(sheetId: string, range: string): Pr
 
             const columnName = cleanVariableName(column);
             return {
-                name: columnName.toLowerCase(),
+                name: columnName,
                 position: index
             } as Column;
         })

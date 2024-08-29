@@ -30,11 +30,12 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
     if (table.sheetRange) {
         sheetRange = table.sheetRange;
     }
+    let inputHasColumns = input.columns ? true : false;
     const concatRange = table.sheetName + '!' + sheetRange ?? 'A1:ZZ';
     let requestedColumns: Column[] = []
     const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, concatRange);
     try {
-        if (table.columns) {
+        if (inputHasColumns && table.columns) {
             requestedColumns = table.columns.sort((a: Column, b: Column) => a.position - b.position);
         }
         else {

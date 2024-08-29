@@ -8,11 +8,10 @@ export default function cleanVariableName(variableName: string) {
         .replace(/[^a-zA-Z0-9\s]/g, '')     // Elimina cualquier carácter que no sea alfanumérico o espacio
         .replace(/\s+/g, '_')               // Reemplaza espacios por guion bajo
         .replace(/_+$/g, '').trim();               // Elimina guiones bajos al final
-    console.log("cleaned", cleanedText);
     // Mover números al final si están al inicio
     if (/^\d/.test(cleanedText)) {
         cleanedText = cleanedText.replace(/^(\d+)(.*)/, '$2_$1');
     }
 
-    return cleanedText;
+    return cleanedText.toLowerCase();
 }
