@@ -299,7 +299,7 @@ async function insertGoogleSheetData(docId: string, bookAndRange: string, data: 
                 console.log(clearResponse);
             }
         }
-        const response = await _sheets.spreadsheets.values.update({
+        const response = await _sheets.spreadsheets.values.append({
             spreadsheetId: docId,
             range: bookAndRange,
             valueInputOption: "USER_ENTERED",

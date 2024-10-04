@@ -31,7 +31,7 @@ const getDataFromTable = async (input: SheetDataReq): Promise<GetDataResponsePro
         sheetRange = table.sheetRange;
     }
     let inputHasColumns = input.columns ? true : false;
-    const concatRange = table.sheetName + '!' + sheetRange ?? 'A1:ZZ';
+    var concatRange = table.sheetName + '!' + (sheetRange ?? 'A1:ZZ');
     let requestedColumns: Column[] = []
     const rawSpreadSheetData = await googleApi.getGoogleSheetDataAsFlatArray(table.googleFileId, concatRange);
     try {
