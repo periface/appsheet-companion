@@ -21,13 +21,27 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
  * @returns GoogleAuth<JSONClient>9-8
  */
 
-function authGoogle(credentials: string): GoogleAuth<JSONClient> {
+function authGoogle(opts: {
+    folderFile?: string,
+    keyString?: string
+}): GoogleAuth<JSONClient> {
     if (_auth) return _auth;
-    const credentialsFile = join(process.cwd(), credentials);
-    _auth = new Auth.GoogleAuth({
-        keyFile: credentialsFile,
-        scopes: SCOPES
-    });
+
+    const { folderFile, keyString } = opts
+
+    if (keyString) {
+
+        _auth = new Auth.GoogleAuth({
+            keyFile: JSON.parse(keyString),
+            scopes: SCOPES
+        });
+    } else if (folderFile) {
+        const credentialsFile = join(process.cwd(), credentials);
+        _auth = new Auth.GoogleAuth({
+            keyFile: credentialsFile,
+            scopes: SCOPES
+        });
+    }
 
     return _auth;
 }
